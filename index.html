@@ -159,6 +159,7 @@ dialog#ficha::backdrop { background: rgba(0,0,0,.6); }
   .controls .field { flex: 1 1 130px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+input[type="checkbox"] { accent-color: var(--accent); }
 
 </style>
 </head>
@@ -198,10 +199,15 @@ dialog#ficha::backdrop { background: rgba(0,0,0,.6); }
       <header><h2>Nubes y seeing</h2></header>
       <div id="meteo-body" style="display:grid;gap:10px;grid-template-columns:minmax(0,1fr)"></div>
     </div>
+    <details class="card" id="flt-card">
+      <summary><h2 style="display:inline">Qué mostrar</h2> <span class="muted small">tipos, catálogos y brillo para el mapa, «Lo mejor» y el Dwarf</span></summary>
+      <div data-filters style="display:grid;gap:10px;margin-top:10px"></div>
+    </details>
     <div class="grid2">
       <div class="card">
         <header><h2>El cielo ahora</h2><span class="muted small" id="map-when"></span></header>
         <canvas id="skymap" width="560" height="560" aria-label="Mapa del cielo con planetas, Luna, estrellas y objetos. Toca uno para ver su ficha."></canvas>
+        <p class="muted small" id="map-info"></p>
         <p class="muted small">Míralo tumbado con la cabeza hacia el norte: el centro es el cénit y el borde el horizonte. Toca un punto para abrir su ficha.</p>
       </div>
       <div class="card">
@@ -211,9 +217,19 @@ dialog#ficha::backdrop { background: rgba(0,0,0,.6); }
       </div>
     </div>
     <div class="card">
-      <header><h2>Lo mejor de esta noche</h2><span class="muted small">Ordenado por horas a más de 30° de altura con el cielo oscuro y por cómo molesta la Luna</span></header>
-      <canvas id="altchart" width="1100" height="260" aria-label="Altura de los mejores objetos a lo largo de la noche"></canvas>
+      <header><h2>Mi lista de esta noche</h2><span class="muted small" id="list-count"></span></header>
+      <p class="muted small">Marca la casilla de lo que quieras observar: el mapa «El cielo ahora» mostrará solo tus marcados. Pulsa el nombre para abrir su ficha.</p>
+      <div class="row">
+        <label class="field">Ordenar por
+          <select id="list-sort"><option value="vis">Visibilidad (lo mejor primero)</option><option value="hora">Hora en que está más alto</option><option value="alt">Altura máxima</option><option value="mag">Brillo</option></select></label>
+        <label class="btn ghost" style="align-self:end"><input type="checkbox" id="list-only"> Solo los marcados</label>
+        <button class="btn" type="button" id="list-top" style="align-self:end">Marcar los 10 mejores</button>
+        <button class="btn ghost" type="button" id="list-clear" style="align-self:end">Quitar marcas</button>
+      </div>
+      <canvas id="altchart" width="1100" height="260" aria-label="Altura de los objetos marcados a lo largo de la noche"></canvas>
+      <p class="muted small" id="chart-note"></p>
       <div class="tablewrap"><table id="best-table"></table></div>
+      <div class="row"><button class="btn" type="button" id="list-more" hidden>Ver más</button></div>
     </div>
   </section>
 
@@ -222,6 +238,7 @@ dialog#ficha::backdrop { background: rgba(0,0,0,.6); }
     <div class="card">
       <header><h2>Objetivos para el Dwarf 3</h2><span class="muted small" id="dwarf-fov"></span></header>
       <div id="dwarf-meteo"></div>
+      <details><summary class="small">Qué mostrar (tipos, catálogos y brillo)</summary><div data-filters style="display:grid;gap:10px;margin-top:10px"></div></details>
       <p class="lead">Objetos que esta noche pasan al menos una hora por encima de 30° con el cielo oscuro. Para cada uno verás cómo encaja en el campo de la cámara tele, qué filtro usar y cuánto tiempo de exposición total conviene.</p>
       <div class="row">
         <label class="field">Tipo
@@ -262,6 +279,8 @@ dialog#ficha::backdrop { background: rgba(0,0,0,.6); }
           </select></label>
         <label class="field">Público
           <select id="ch-lvl"><option value="general">General</option><option value="ninos">Niños</option></select></label>
+        <label class="field">Objetos
+          <select id="ch-src"><option value="auto">Los elige Astrorus</option><option value="lista">Mi lista de esta noche</option></select></label>
       </div>
       <div class="row">
         <button class="btn primary" id="ch-play" type="button">Leer toda la charla</button>
@@ -280,6 +299,8 @@ dialog#ficha::backdrop { background: rgba(0,0,0,.6); }
           <input type="search" id="cat-q" placeholder="M31, Orión, galaxia, Cisne…"></label>
         <label class="field">Tipo
           <select id="cat-type"></select></label>
+        <label class="field">Catálogo
+          <select id="cat-src"><option value="all">Todos</option><option value="m">Messier</option><option value="dest">Destacados</option><option value="ngc">NGC / IC</option><option value="otros">Estrellas, planetas y Luna</option></select></label>
         <label class="field">Mostrar
           <select id="cat-vis"><option value="all">Todo</option><option value="tonight">Visible esta noche</option></select></label>
       </div>
@@ -12993,6 +13014,24 @@ const S = {
   red: store.get("red", false)
 };
 const place = () => S.places[Math.min(S.placeIdx, S.places.length - 1)] || DEFAULT_PLACES[0];
+/* ===== Qué mostrar: filtros compartidos por el mapa, «Lo mejor» y el Dwarf ===== */
+const FLT_DEFAULT = { gal: true, neb: true, clu: true, star: true, pl: true, m: true, dest: true, ngc: false, mag: 9, labels: true };
+S.flt = { ...FLT_DEFAULT, ...store.get("flt", {}) };
+// Mi lista: objetos marcados por el usuario (se guardan en este dispositivo)
+S.sel = new Set(store.get("sel", []));
+S.listSort = store.get("listSort", "vis"); S.listOnly = false; S.listN = 40;
+const saveSel = () => store.set("sel", [...S.sel]);
+const GROUP = t => ["GS", "GE", "GL", "GI", "G", "GG"].includes(t) ? "gal" : ["EN", "RN", "DN", "SNR", "PN"].includes(t) ? "neb" : ["OC", "GC", "AST", "SC", "DS"].includes(t) ? "clu" : null;
+function passes(o, ignoreMag) {
+  const f = S.flt;
+  if (o.kind === "planet" || o.kind === "moon") return f.pl;
+  if (o.kind === "star") return f.star;
+  const g = GROUP(o.type); if (g && !f[g]) return false;
+  if (o.ngc ? !f.ngc : /^M\d/.test(o.id) ? !f.m : !f.dest) return false;
+  if (ignoreMag) return true;
+  if (o.mag == null) return f.mag >= 14;
+  return o.mag <= f.mag;
+}
 
 /* ================== posiciones ================== */
 function radec(o, d) {
@@ -13604,15 +13643,43 @@ function moonFreeWindow(n) {
   return { txt: `${fmtT(best.s)} – ${fmtT(new Date(best.e.getTime() + 15 * 60000))}`, sub: `${nf1.format(best.m / 60)} h para lo más débil (galaxias)` };
 }
 function bestList(n = 12) {
-  return FEATURED.map(o => ({ o, t: track(o) })).filter(x => x.t.hours30 >= 0.5).sort((a, b) => b.t.score - a.t.score).slice(0, n);
+  const pool = S.flt.ngc && S.flt.mag > 11 ? DSOS.filter(o => passes(o)) : FEATURED.filter(o => passes(o));
+  return pool.map(o => ({ o, t: track(o) })).filter(x => x.t.hours30 >= 0.5).sort((a, b) => b.t.score - a.t.score).slice(0, n);
+}
+function nightList() {
+  const pool = S.flt.ngc && S.flt.mag > 11 ? DSOS.filter(o => passes(o)) : FEATURED.filter(o => passes(o));
+  // los marcados siempre entran, aunque los filtros los dejen fuera
+  for (const k of S.sel) { const o = BY_KEY[k]; if (o && o.kind === "dso" && !pool.includes(o)) pool.push(o); }
+  let list = pool.map(o => ({ o, t: track(o) })).filter(x => x.t.maxAlt > 15 || S.sel.has(x.o.key));
+  const by = {
+    vis: (x, y) => y.t.score - x.t.score || y.t.maxAlt - x.t.maxAlt,
+    hora: (x, y) => (x.t.maxT ?? 0) - (y.t.maxT ?? 0),
+    alt: (x, y) => y.t.maxAlt - x.t.maxAlt,
+    mag: (x, y) => (x.o.mag ?? 99) - (y.o.mag ?? 99)
+  }[S.listSort] || ((x, y) => y.t.score - x.t.score);
+  list.sort(by);
+  if (S.listOnly) list = list.filter(x => S.sel.has(x.o.key));
+  return list;
 }
 function renderBest() {
-  const list = bestList(14);
-  $("best-table").innerHTML = `<thead><tr><th>Objeto</th><th>Tipo</th><th>Mejor hora</th><th>Altura máx.</th><th>Por encima de 30°</th><th>Luna</th></tr></thead><tbody>` +
-    list.map(({ o, t }) => `<tr class="click" data-key="${o.key}"><td><div class="name">${esc(shortLabel(o))}</div><div class="alt">${esc(o.name && o.id.startsWith("M") ? o.name : CONS[o.con] || "")}</div></td>
+  const all = nightList(), list = all.slice(0, S.listN);
+  $("best-table").innerHTML = list.length ? `<thead><tr><th>Ver</th><th>Objeto</th><th>Tipo</th><th>Mejor hora</th><th>Altura máx.</th><th>Por encima de 30°</th><th>Luna</th></tr></thead><tbody>` +
+    list.map(({ o, t }) => `<tr><td><input type="checkbox" data-sel="${o.key}" ${S.sel.has(o.key) ? "checked" : ""} aria-label="Ver ${esc(shortLabel(o))} en el mapa" style="width:22px;height:22px"></td>
+      <td class="click" data-key="${o.key}" style="cursor:pointer"><div class="name">${esc(shortLabel(o))}</div><div class="alt">${esc(o.name && o.id.startsWith("M") ? o.name : o.en || CONS[o.con] || "")}</div></td>
       <td><span class="chip" style="color:${TYPES[o.type].c}"><span class="dot"></span>${TYPES[o.type].n}</span></td>
-      <td>${fmtT(t.maxT)}</td><td>${nf0.format(t.maxAlt)}°</td><td>${fmtT(t.wStart)} – ${fmtT(t.wEnd)}</td><td>${moonChip(t)}</td></tr>`).join("") + `</tbody>`;
-  drawAltChart(list.slice(0, 5).map(x => x.o));
+      <td>${fmtT(t.maxT)}</td><td>${nf0.format(t.maxAlt)}°</td><td>${t.wStart ? `${fmtT(t.wStart)} – ${fmtT(t.wEnd)}` : "No llega a 30°"}</td><td>${moonChip(t)}</td></tr>`).join("") + `</tbody>`
+    : `<tbody><tr><td class="empty">${S.listOnly ? "Todavía no has marcado ningún objeto." : "Ningún objeto cumple los filtros de «Qué mostrar» esta noche."}</td></tr></tbody>`;
+  $("list-more").hidden = all.length <= S.listN;
+  updateListExtras(all);
+}
+function updateListExtras(all = nightList()) {
+  const nSel = [...S.sel].filter(k => BY_KEY[k]).length;
+  $("list-count").textContent = `${nf0.format(all.length)} objetos visibles con tus filtros · ${nSel} marcados`;
+  $("list-more").textContent = `Ver ${Math.min(40, all.length - S.listN)} más`;
+  // gráfica: los marcados (hasta 6) o, si no hay, los 5 mejores
+  const marked = all.filter(x => S.sel.has(x.o.key)).slice(0, 6);
+  drawAltChart((marked.length ? marked : all.slice(0, 5)).map(x => x.o));
+  $("chart-note").textContent = marked.length ? "En la gráfica: tus objetos marcados (hasta 6)." : "En la gráfica: los 5 mejores. Marca objetos para ver los tuyos.";
 }
 function renderPlanets() {
   const p = place();
@@ -13672,7 +13739,7 @@ function drawAltChart(objs) {
   let lx = L + 6; ctx.font = "bold 12px " + css("--font-body");
   for (const [t, c2] of legend) { ctx.fillStyle = c2; ctx.fillRect(lx, T + 4, 10, 3); ctx.fillText(t, lx + 14, T + 10); lx += ctx.measureText(t).width + 30; if (lx > w - 80) break; }
 }
-let MAP_HITS = [];
+let MAP_HITS = [], MAP_INFO = "";
 function drawSkyMap() {
   const c = $("skymap"); const { ctx, w } = fitCanvas(c); const p = place();
   const cx = w / 2, cy = w / 2, R = w / 2 - 22;
@@ -13690,40 +13757,63 @@ function drawSkyMap() {
   ctx.fillStyle = css("--muted"); ctx.font = "bold 14px " + css("--font-body"); ctx.textAlign = "center"; ctx.textBaseline = "middle";
   [["N", 0], ["E", 90], ["S", 180], ["O", 270]].forEach(([t, az]) => { const [x2, y2] = pos({ alt: -14, az }); ctx.fillText(t, x2, y2); });
   MAP_HITS = [];
+  // Los nombres se colocan al final, por prioridad, sin pisarse
+  const LABELS = [];
+  const addLabel = (text, x, y, r, color, bold, prio) => LABELS.push({ text, x, y, r, color, bold, prio });
   const dot = (o, h, r, color, text, bold) => {
     const [x, y] = pos(h); ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
-    if (text) { ctx.font = (bold ? "bold " : "") + "12px " + css("--font-body"); ctx.textAlign = "left"; ctx.fillStyle = bold ? css("--ink") : css("--muted"); ctx.fillText(text, x + r + 3, y); }
+    if (text) addLabel(text, x, y, r, bold ? css("--ink") : css("--muted"), bold, bold ? 1 : 3);
     MAP_HITS.push({ x, y, r: Math.max(r, 9), o });
   };
-  for (const o of OBJECTS.filter(o => o.kind === "star")) {
+  const F = S.flt;
+  if (F.star) for (const o of OBJECTS.filter(o => o.kind === "star")) {
     const h = horiz(o, S.time, p); if (h.alt < 0) continue;
-    dot(o, h, Math.max(1.6, 4.2 - o.mag * 0.9), S.red ? "#ff6a5a" : "#fff6dc", o.mag < 1.6 ? o.name : "", false);
+    dot(o, h, Math.max(1.6, 4.2 - o.mag * 0.9), S.red ? "#ff6a5a" : "#fff6dc", F.labels && o.mag < 1.6 ? o.name : "", false);
   }
-  const best = new Set(bestList(10).map(x => x.o.key));
-  for (const o of DSOS) {
-    if (!(best.has(o.key) || o.mag < 5)) continue;
-    const h = horiz(o, S.time, p); if (h.alt < 0) continue;
+  // cielo profundo: los que pasan el filtro, como mucho 40, con nombre solo los 12 más brillantes
+  const vis = [];
+  const marked = [...S.sel].map(k => BY_KEY[k]).filter(o => o && o.kind === "dso");
+  const source = marked.length ? marked : nightList().slice(0, 12).map(x => x.o);
+  for (const o of source) { const h = horiz(o, S.time, p); if (h.alt > 0) vis.push({ o, h }); }
+  vis.sort((x, y) => (x.o.mag ?? 99) - (y.o.mag ?? 99));
+  const shown = vis.slice(0, 40);
+  shown.forEach(({ o, h }, i) => {
     const col = S.red ? "#ff3b2b" : TYPES[o.type].c;
-    const [x, y] = pos(h); ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, y, 4.5, 0, 7); ctx.stroke();
-    ctx.font = "11px " + css("--font-body"); ctx.textAlign = "left"; ctx.fillStyle = col; ctx.fillText(o.id, x + 7, y);
+    const [x, y] = pos(h); ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, y, i < 12 ? 4.5 : 3, 0, 7); ctx.stroke();
+    if (F.labels && i < 25) addLabel(o.id, x, y, 4.5, col, false, 4 + i / 100);
     MAP_HITS.push({ x, y, r: 10, o });
-  }
-  for (const o of OBJECTS.filter(o => o.kind === "planet")) {
+  });
+  MAP_INFO = marked.length ? `Tus objetos marcados: ${vis.length} sobre el horizonte ahora${marked.length > vis.length ? ` (${marked.length - vis.length} todavía bajo el horizonte)` : ""}.` : `Sin objetos marcados: se muestran los 12 mejores de la noche. Marca los tuyos en «Mi lista de esta noche».`;
+  if (F.pl) for (const o of OBJECTS.filter(o => o.kind === "planet")) {
     const h = horiz(o, S.time, p); if (h.alt < 0) continue;
-    dot(o, h, 4.5, S.red ? "#ff5b4a" : "#ffd27a", o.name, true);
+    dot(o, h, 4.5, S.red ? "#ff5b4a" : "#ffd27a", F.labels ? o.name : "", true);
   }
   const mo = BY_KEY.luna, mh = horiz(mo, S.time, p);
-  if (mh.alt > -0.5) {
+  if (F.pl && mh.alt > -0.5) {
     const [x, y] = pos(mh), ph = Astro.moonPhase(S.time);
     ctx.fillStyle = "#333"; ctx.beginPath(); ctx.arc(x, y, 9, 0, 7); ctx.fill();
     ctx.fillStyle = S.red ? "#ff5b4a" : "#eeeeee"; ctx.beginPath();
     const k = ph.illum * 2 - 1, waxing = ph.elong < 180;
     ctx.arc(x, y, 9, -Math.PI / 2, Math.PI / 2, !waxing);
     ctx.ellipse(x, y, Math.abs(k) * 9, 9, 0, Math.PI / 2, -Math.PI / 2, (k > 0) === waxing ? true : false); ctx.fill();
-    ctx.font = "bold 12px " + css("--font-body"); ctx.textAlign = "left"; ctx.fillStyle = css("--ink"); ctx.fillText("Luna", x + 12, y);
+    ctx.font = "bold 12px " + css("--font-body"); ctx.textAlign = "left"; if (F.labels) addLabel("Luna", x, y, 9, css("--ink"), true, 0);
     MAP_HITS.push({ x, y, r: 12, o: mo });
   }
+  // colocar nombres: a la derecha y, si choca, a la izquierda; si tampoco cabe, se omite
+  const boxes = [];
+  const hit = bx => bx.x < 2 || bx.x + bx.w > w - 2 || bx.y < 2 || bx.y + bx.h > w - 2 || boxes.some(q => bx.x < q.x + q.w && bx.x + bx.w > q.x && bx.y < q.y + q.h && bx.y + bx.h > q.y);
+  ctx.textBaseline = "middle";
+  for (const L of LABELS.sort((p1, p2) => p1.prio - p2.prio)) {
+    ctx.font = (L.bold ? "bold 12px " : "11px ") + css("--font-body");
+    const w = ctx.measureText(L.text).width + 2, h = 13;
+    const tries = [{ x: L.x + L.r + 3, y: L.y - h / 2 }, { x: L.x - L.r - 3 - w, y: L.y - h / 2 }, { x: L.x - w / 2, y: L.y + L.r + 2 }, { x: L.x - w / 2, y: L.y - L.r - 2 - h }];
+    const ok = tries.find(bx => !hit({ ...bx, w, h }));
+    if (!ok) continue;
+    boxes.push({ ...ok, w, h });
+    ctx.textAlign = "left"; ctx.fillStyle = L.color; ctx.fillText(L.text, ok.x + 1, ok.y + h / 2);
+  }
   $("map-when").textContent = `${fmtT(S.time)} · ${sunAlt > -0.8 ? "es de día" : sunAlt > -18 ? "crepúsculo" : "noche cerrada"}`;
+  $("map-info").textContent = MAP_INFO;
 }
 
 /* ================== Dwarf ================== */
@@ -13731,7 +13821,7 @@ function renderDwarf() {
   $("dwarf-fov").textContent = `Campo de la cámara tele: ${nf1.format(FOV.w / 60)}° × ${nf1.format(FOV.h / 60)}°`;
   const ty = $("dw-type").value, fm = $("dw-fit").value;
   const groups = { neb: ["EN", "SNR", "PN", "RN", "DN"], gal: ["GS", "GE", "GL", "GI"], clu: ["OC", "GC"] };
-  const list = FEATURED.map(o => ({ o, t: track(o), f: fit(o) }))
+  const list = FEATURED.filter(o => passes(o)).map(o => ({ o, t: track(o), f: fit(o) }))
     .filter(x => x.t.hours30 >= 1 && (ty === "all" || groups[ty].includes(x.o.type)) && (fm === "all" || x.f.cls === "good" || x.f.txt.startsWith("Justo")) && !["AST", "DS", "SC"].includes(x.o.type))
     .sort((a, b) => b.t.score - a.t.score).slice(0, 30);
   $("dwarf-table").innerHTML = list.length ? `<thead><tr><th>Objeto</th><th>Ventana (&gt;30°)</th><th>Encuadre</th><th>Filtro</th><th>Integración</th><th>Luna</th><th></th></tr></thead><tbody>` +
@@ -13781,7 +13871,11 @@ function buildCharla() {
   stars.forEach((x, i) => cands.push({ o: x.o, prio: 60 - i * 3 }));
   if (horiz(BY_KEY.albireo, mid, p).alt > 25 && eq !== "ojo") cands.push({ o: BY_KEY.albireo, prio: 55 });
   const dsoLim = eq === "ojo" ? 6.0 : 8.6;
-  DSOS.filter(o => o.mag <= dsoLim && !["AST", "DS", "DN"].includes(o.type) && (o.id.startsWith("M") || ["NGC 869", "Cr 399"].includes(o.id))).map(o => ({ o, h: horiz(o, mid, p) }))
+  const useList = $("ch-src").value === "lista" && S.sel.size;
+  if (useList) {
+    [...S.sel].map(k => BY_KEY[k]).filter(o => o && o.kind === "dso").map(o => ({ o, h: horiz(o, mid, p) }))
+      .filter(x => x.h.alt > 15).forEach((x, i) => cands.push({ o: x.o, prio: 80 - i }));
+  } else DSOS.filter(o => o.mag <= dsoLim && !["AST", "DS", "DN"].includes(o.type) && (o.id.startsWith("M") || ["NGC 869", "Cr 399"].includes(o.id))).map(o => ({ o, h: horiz(o, mid, p) }))
     .filter(x => x.h.alt > 25).sort((a, b) => a.o.mag - b.o.mag).slice(0, 10)
     .forEach((x, i) => cands.push({ o: x.o, prio: 70 - i * 2 - Math.max(0, x.o.mag - 4) * 2 }));
   const chosen = cands.sort((a, b) => b.prio - a.prio).slice(0, maxStops);
@@ -13822,12 +13916,13 @@ function highlightStop(i) {
 
 /* ================== Catálogo ================== */
 function renderCatalog() {
-  const q = $("cat-q").value.trim().toLowerCase(), ty = $("cat-type").value, vis = $("cat-vis").value;
+  const q = $("cat-q").value.trim().toLowerCase(), ty = $("cat-type").value, vis = $("cat-vis").value, cs = $("cat-src").value;
   const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   const qq = norm(q);
   const qn = qq.replace(/\s+/g, "");
   const list = OBJECTS.filter(o => {
     if (ty !== "all" && o.type !== ty) return false;
+    if (cs !== "all") { const src = o.kind !== "dso" ? "otros" : o.ngc ? "ngc" : /^M\d/.test(o.id) ? "m" : "dest"; if (src !== cs) return false; }
     if (qq) { const hay = norm([o.id, o.alt, o.name, o.en, CONS[o.con], TYPES[o.type]?.n].join(" ")); if (!hay.includes(qq) && !hay.replace(/\s+/g, "").includes(qn)) return false; }
     if (vis === "tonight") { if (o.kind === "dso" || o.kind === "star") return track(o).maxAlt > 20; return riseSet(o).maxAlt > 10; }
     return true;
@@ -14065,7 +14160,8 @@ function openFicha(o) {
     <div class="row"><button class="btn primary" type="button" id="f-say">Escuchar la ficha</button>
       <a class="btn" href="${stelWeb(o)}" target="_blank" rel="noopener">Ver en Stellarium Web</a>
       <button class="btn" type="button" id="f-stel">Copiar para Stellarium</button>
-      ${isDso ? `<button class="btn" type="button" id="f-plan">Añadir al plan del Dwarf</button>` : ""}</div>
+      ${isDso ? `<button class="btn" type="button" id="f-plan">Añadir al plan del Dwarf</button>` : ""}
+      ${isDso ? `<label class="btn"><input type="checkbox" data-sel="${o.key}" ${S.sel.has(o.key) ? "checked" : ""}> En mi lista</label>` : ""}</div>
     <div class="facts">${facts.map(([k, v]) => `<div class="tile"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`).join("")}</div>
     <div class="sec"><h4>Esta noche desde ${esc(p.name)}</h4><p>${nowTxt} ${rsTxt}</p><p class="muted">${esc(howToSee(o))}</p></div>
     <div class="sec"><h4>Qué es</h4><p>${esc(o.desc)}</p>${t.comp ? `<p>${esc(t.comp)}</p>` : ""}</div>
@@ -14097,6 +14193,30 @@ function openFicha(o) {
   }
   if (!dlg.open) dlg.showModal();
 }
+
+
+function renderFilters() {
+  const f = S.flt;
+  const chip = (k, txt) => `<button class="btn${f[k] ? "" : " ghost"}" type="button" data-flt="${k}" aria-pressed="${f[k] ? "true" : "false"}">${txt}</button>`;
+  const magTxt = f.mag >= 14 ? "todos" : `hasta magnitud ${nf1.format(f.mag)}`;
+  const html = `<div class="row">${chip("gal", "Galaxias")}${chip("neb", "Nebulosas")}${chip("clu", "Cúmulos")}${chip("star", "Estrellas")}${chip("pl", "Planetas y Luna")}</div>
+    <div class="row">${chip("m", "Messier")}${chip("dest", "Destacados")}${chip("ngc", "NGC / IC")}${chip("labels", "Nombres en el mapa")}</div>
+    <label class="field" style="max-width:440px">Brillo: <span data-flt-magtxt>${magTxt}</span> (más a la derecha, más objetos débiles)
+      <input type="range" min="4" max="14" step="0.5" value="${f.mag}" data-flt-mag></label>
+    <div class="row"><button class="btn ghost" type="button" data-flt-reset>Volver a lo básico</button><span class="muted small">${nf0.format(DSOS.filter(o => passes(o)).length)} objetos de cielo profundo con estos filtros</span></div>`;
+  document.querySelectorAll("[data-filters]").forEach(el => el.innerHTML = html);
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-flt]"); if (b) { S.flt[b.dataset.flt] = !S.flt[b.dataset.flt]; store.set("flt", S.flt); renderFilters(); render(); return; }
+  if (e.target.closest("[data-flt-reset]")) { S.flt = { ...FLT_DEFAULT }; store.set("flt", S.flt); renderFilters(); render(); }
+});
+let fltT;
+document.addEventListener("input", e => {
+  const r = e.target.closest("[data-flt-mag]"); if (!r) return;
+  S.flt.mag = +r.value; store.set("flt", S.flt);
+  document.querySelectorAll("[data-flt-magtxt]").forEach(x => x.textContent = S.flt.mag >= 14 ? "todos" : `hasta magnitud ${nf1.format(S.flt.mag)}`);
+  clearTimeout(fltT); fltT = setTimeout(() => { renderFilters(); render(); }, 300);
+});
 
 /* ================== navegación y render ================== */
 function setView(v) {
@@ -14156,12 +14276,13 @@ $("btn-now").addEventListener("click", () => { S.time = new Date(); S.follow = t
 $("btn-red").addEventListener("click", () => { S.red = !S.red; store.set("red", S.red); applyRed(); render(); });
 function applyRed() { document.documentElement.classList.toggle("rojo", S.red); $("btn-red").setAttribute("aria-pressed", S.red ? "true" : "false"); }
 ["dw-type", "dw-fit"].forEach(id => $(id).addEventListener("change", renderDwarf));
-["ch-start", "ch-dur", "ch-eq", "ch-lvl"].forEach(id => $(id).addEventListener("change", buildCharla));
+["ch-start", "ch-dur", "ch-eq", "ch-lvl", "ch-src"].forEach(id => $(id).addEventListener("change", buildCharla));
 $("ch-play").addEventListener("click", () => { if (!CHARLA.length) buildCharla(); Voice.say(CHARLA.map(s => `${fmtT(s.t).replace(":", " y ")}. ${label(s.o)}. ${s.look} ${s.text}`), highlightStop); });
 $("ch-copy").addEventListener("click", () => copy(charlaScript()));
 $("cat-q").addEventListener("input", renderCatalog);
 $("cat-type").addEventListener("change", renderCatalog);
 $("cat-vis").addEventListener("change", renderCatalog);
+$("cat-src").addEventListener("change", renderCatalog);
 $("player-stop").addEventListener("click", () => Voice.stop());
 $("voice-sel").addEventListener("change", () => { S.voice = $("voice-sel").value; store.set("voice2", S.voice); });
 $("voice-rate").addEventListener("input", () => { S.rate = +$("voice-rate").value; store.set("rate2", S.rate); });
@@ -14202,6 +14323,21 @@ document.addEventListener("click", e => {
   if (ds) { EQUIP.scopes = EQUIP.scopes.filter(x => x.id !== ds.dataset.delScope); if (!scope()) EQUIP.active = EQUIP.scopes[0]?.id; Equip.save(); }
   if (de) { EQUIP.eps = EQUIP.eps.filter(x => x.id !== de.dataset.delEp); Equip.save(); }
 });
+document.addEventListener("change", e => {
+  const c = e.target.closest("[data-sel]"); if (!c) return;
+  if (c.checked) S.sel.add(c.dataset.sel); else S.sel.delete(c.dataset.sel);
+  saveSel();
+  // sincroniza la otra casilla del mismo objeto (lista y ficha) sin redibujar la tabla
+  document.querySelectorAll(`[data-sel="${c.dataset.sel}"]`).forEach(x => { if (x !== c) x.checked = c.checked; });
+  if (S.listOnly) renderBest(); else updateListExtras();
+  drawSkyMap();
+});
+$("list-sort").value = S.listSort;
+$("list-sort").addEventListener("change", () => { S.listSort = $("list-sort").value; store.set("listSort", S.listSort); renderBest(); });
+$("list-only").addEventListener("change", () => { S.listOnly = $("list-only").checked; S.listN = 40; renderBest(); });
+$("list-top").addEventListener("click", () => { nightList().filter(x => x.t.hours30 >= 1).slice(0, 10).forEach(x => S.sel.add(x.o.key)); saveSel(); renderBest(); drawSkyMap(); toast("Marcados los 10 mejores"); });
+$("list-clear").addEventListener("click", () => { S.sel.clear(); saveSel(); S.listOnly = false; $("list-only").checked = false; renderBest(); drawSkyMap(); });
+$("list-more").addEventListener("click", () => { S.listN += 40; renderBest(); });
 window.addEventListener("hashchange", () => setView(location.hash.slice(1)));
 let rT; window.addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(() => { if (S.view === "noche") { drawSkyMap(); drawAltChart(bestList(5).map(x => x.o)); } }, 150); });
 
@@ -14212,7 +14348,7 @@ $("voice-rate").value = S.rate;
 $("voice-note").textContent = Voice.ok ? "Buscando voces…" : "Este navegador no permite leer en voz alta.";
 if (Voice.ok) { Voice.load(); try { speechSynthesis.onvoiceschanged = () => Voice.load(); } catch { /* nada */ } }
 (() => { const n = getNight(); const base = n.darkStart ? Math.max(n.darkStart.getTime(), n.date.getTime() + 9 * 3600000) : n.date.getTime() + 9 * 3600000; const st = new Date(Math.ceil(base / 900000) * 900000); $("ch-start").value = `${pad(st.getHours())}:${pad(st.getMinutes())}`; })();
-applyRed(); renderPlaces(); renderEquip(); syncInputs(); fillDiaryForm(null); renderDiary(); renderPlan(); Data.note();
+applyRed(); renderPlaces(); renderEquip(); renderFilters(); syncInputs(); fillDiaryForm(null); renderDiary(); renderPlan(); Data.note();
 setView(location.hash.slice(1) || "noche");
 setInterval(() => { if (S.follow) { S.time = new Date(); syncInputs(); if (S.view === "noche") { drawSkyMap(); renderPlanets(); } } }, 60000);
 (async () => {
