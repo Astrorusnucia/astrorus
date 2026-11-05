@@ -605,6 +605,7 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
   <div class="ar-top">
     <button class="btn" type="button" id="ar-close" aria-label="Cerrar">✕ Cerrar</button>
     <input type="search" id="ar-target" list="obj-names" placeholder="Llévame a…" aria-label="Objeto al que ir">
+    <button class="btn" type="button" id="ar-sens" hidden>Activar sensores</button>
     <button class="btn" type="button" id="ar-cam" aria-pressed="false">Cámara</button>
     <button class="btn" type="button" id="ar-red" aria-pressed="false">Rojo</button>
   </div>
@@ -15178,7 +15179,14 @@ const AR = {
   // orientación del móvil (W3C: alpha, beta, gamma) → vectores derecha, arriba y detrás de la pantalla en el marco este-norte-arriba
   fromEuler(a, b, g) {
     const r = Astro.RAD, ca = Math.cos(a * r), sa = Math.sin(a * r), cb = Math.cos(b * r), sb = Math.sin(b * r), cg = Math.cos(g * r), sg = Math.sin(g * r);
-    const m = [[ca * cg - sa * sb * sg, -cb * sa, ca * sg + cg * sa * sb], [cg * sa + ca * sb * sg, ca * cb, sa * sg - ca * cg * sb], [-cb * sg, sb, cb * cg]];
+    return this.fromMatrix([[ca * cg - sa * sb * sg, -cb * sa, ca * sg + cg * sa * sb], [cg * sa + ca * sb * sg, ca * cb, sa * sg - ca * cg * sb], [-cb * sg, sb, cb * cg]]);
+  },
+  fromQuat([x, y, z, w]) {
+    return this.fromMatrix([[1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)], [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)], [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)]]);
+  },
+  // m: columnas = ejes del móvil (x derecha, y arriba, z hacia ti) en este-norte-arriba
+  fromMatrix(m) {
+    const r = Astro.RAD;
     const col = i => [m[0][i], m[1][i], m[2][i]];
     const ang = ((screen.orientation && screen.orientation.angle) ?? window.orientation ?? 0) * r;
     const X = col(0), Y = col(1), Z = col(2);
@@ -15186,7 +15194,41 @@ const AR = {
     const up = X.map((x, i) => Math.sin(ang) * x + Math.cos(ang) * Y[i]);
     return { right, up, back: Z };
   },
+  feed(R) {
+    if (!this.R) this.R = R;
+    else for (const k of ["right", "up", "back"]) this.R[k] = this.R[k].map((x, i) => x + (R[k][i] - x) * 0.22);
+    if (!this.sensor) this.hint("");
+    this.sensor = true; this.lastEv = performance.now();
+  },
+  // sensores: primero el sensor de orientación absoluta de Chrome (Android); si no, los eventos de orientación
+  async sensors() {
+    this.sensErr = "";
+    try { if (typeof DeviceOrientationEvent !== "undefined" && DeviceOrientationEvent.requestPermission) { const r = await DeviceOrientationEvent.requestPermission(); if (r !== "granted") this.sensErr = "permiso"; } } catch { /* nada */ }
+    if (!this.h1) { this.h1 = e => this.onOrient(e); window.addEventListener("deviceorientationabsolute", this.h1); window.addEventListener("deviceorientation", this.h1); }
+    if ("AbsoluteOrientationSensor" in window && !this.aos) {
+      try {
+        if (navigator.permissions) {
+          const st = await Promise.all(["accelerometer", "gyroscope", "magnetometer"].map(n => navigator.permissions.query({ name: n }).then(x => x.state).catch(() => "granted")));
+          if (st.includes("denied")) this.sensErr = "bloqueado";
+        }
+        const sn = new AbsoluteOrientationSensor({ frequency: 30, referenceFrame: "device" });
+        sn.addEventListener("reading", () => { if (sn.quaternion) { this.viaSensor = true; this.feed(this.fromQuat(sn.quaternion)); } });
+        sn.addEventListener("error", ev => { this.sensErr = ev.error && ev.error.name === "NotAllowedError" ? "bloqueado" : this.sensErr || "error"; });
+        sn.start(); this.aos = sn;
+      } catch { /* sin sensor genérico: quedan los eventos */ }
+    }
+    clearTimeout(this.chkT);
+    this.chkT = setTimeout(() => {
+      if (!this.on || this.sensor) return;
+      if (!navigator.maxTouchPoints) { this.hint("En el ordenador no hay sensores: arrastra con el ratón para mover el cielo y usa la rueda para acercar"); return; }
+      $("ar-sens").hidden = false;
+      this.hint(this.sensErr === "bloqueado" || this.sensErr === "permiso"
+        ? "Los sensores de movimiento están bloqueados. En Chrome: toca el candado junto a la dirección → Permisos → Sensores de movimiento → Permitir, y pulsa «Activar sensores». Mientras, puedes arrastrar el cielo con el dedo."
+        : "No llegan datos de los sensores. Pulsa «Activar sensores». Si sigue igual, en Chrome: ⋮ → Configuración → Configuración de sitios → Sensores de movimiento → Permitido. Mientras, puedes arrastrar el cielo con el dedo.");
+    }, 2000);
+  },
   onOrient(e) {
+    if (this.viaSensor) return;                      // ya hay sensor de orientación absoluta
     if (e.alpha == null && e.webkitCompassHeading == null) return;
     let a = e.alpha || 0;
     if (e.webkitCompassHeading != null) {          // iPhone: corrige alpha con la brújula
@@ -15196,10 +15238,7 @@ const AR = {
       a += this.iosOff;
     } else if (!e.absolute && this.absSeen) return;
     if (e.absolute) this.absSeen = true;
-    const R = this.fromEuler(a, e.beta || 0, e.gamma || 0);
-    if (!this.R) this.R = R;
-    else for (const k of ["right", "up", "back"]) this.R[k] = this.R[k].map((x, i) => x + (R[k][i] - x) * 0.22);
-    this.sensor = true; this.lastEv = performance.now();
+    this.feed(this.fromEuler(a, e.beta || 0, e.gamma || 0));
   },
   basis() {
     if (this.sensor && this.R) {
@@ -15220,19 +15259,19 @@ const AR = {
     const box = $("ar"); box.hidden = false; this.on = true; this.R = null; this.sensor = false; this.iosOff = null; this.absSeen = false;
     document.body.style.overflow = "hidden";
     $("ar-red").setAttribute("aria-pressed", S.red ? "true" : "false");
-    try { if (typeof DeviceOrientationEvent !== "undefined" && DeviceOrientationEvent.requestPermission) { const r = await DeviceOrientationEvent.requestPermission(); if (r === "denied") toast("Sin permiso para los sensores: arrastra el cielo con el dedo"); } } catch { /* nada */ }
-    this.h1 = e => this.onOrient(e);
-    window.addEventListener("deviceorientationabsolute", this.h1);
-    window.addEventListener("deviceorientation", this.h1);
+    $("ar-sens").hidden = true; this.viaSensor = false;
+    const sp = this.sensors();
     this.refreshBodies(new Date()); this.M = this.matrix(new Date()); this.mT = Date.now();
     this.hint("Levanta el móvil hacia el cielo");
-    setTimeout(() => { if (this.on && !this.sensor) this.hint("No hay sensores de orientación: arrastra para mover el cielo y pellizca o usa la rueda para acercar"); }, 1500);
     const loop = () => { if (!this.on) return; this.draw(); this.raf = requestAnimationFrame(loop); };
     loop();
+    await sp;
   },
   stop() {
     this.on = false; cancelAnimationFrame(this.raf);
-    window.removeEventListener("deviceorientationabsolute", this.h1); window.removeEventListener("deviceorientation", this.h1);
+    window.removeEventListener("deviceorientationabsolute", this.h1); window.removeEventListener("deviceorientation", this.h1); this.h1 = null;
+    if (this.aos) { try { this.aos.stop(); } catch { /* nada */ } this.aos = null; }
+    clearTimeout(this.chkT);
     this.camera(false); $("ar").hidden = true; document.body.style.overflow = "";
   },
   async camera(on) {
@@ -15244,6 +15283,7 @@ const AR = {
     } catch { toast(ANDROID ? "Acepta el permiso de cámara y vuelve a pulsar «Cámara»" : "No se pudo abrir la cámara"); }
   },
   hint(t) { $("ar-hint").textContent = t; },
+  ghint(t) { if (this.sensor || $("ar-sens").hidden) this.hint(t); },
   setTarget(q) {
     const nrm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, "");
     const k = nrm(q); if (!k) { this.target = null; return; }
@@ -15331,7 +15371,7 @@ const AR = {
       if (inView) {
         x.strokeStyle = C.txt; x.lineWidth = 3; x.beginPath(); x.arc(q[0], q[1], 26 + 4 * Math.sin(Date.now() / 200), 0, 7); x.stroke();
         x.fillStyle = C.txt; x.font = "700 15px Atkinson Hyperlegible, sans-serif"; x.textAlign = "center"; x.fillText(t.n, q[0], q[1] - 34);
-        this.hint(talt < 0 ? `${t.n} está bajo el horizonte ahora` : Math.hypot(q[0] - cx, q[1] - cy) < 40 ? `¡Ahí está ${t.n}!` : `${t.n} está en el círculo`);
+        this.ghint(talt < 0 ? `${t.n} está bajo el horizonte ahora` : Math.hypot(q[0] - cx, q[1] - cy) < 40 ? `¡Ahí está ${t.n}!` : `${t.n} está en el círculo`);
       } else {
         // dirección en la pantalla: proyecta sobre el plano de la pantalla
         const dx = t.w[0] * B.right[0] + t.w[1] * B.right[1] + t.w[2] * B.right[2], dy = t.w[0] * B.up[0] + t.w[1] * B.up[1] + t.w[2] * B.up[2];
@@ -15340,9 +15380,9 @@ const AR = {
         const parts = [];
         if (Math.abs(dx) > Math.abs(dy) * 0.5) parts.push(dx > 0 ? "gira a la derecha" : "gira a la izquierda");
         if (Math.abs(dy) > Math.abs(dx) * 0.5) parts.push(dy > 0 ? "sube" : "baja");
-        this.hint(`${t.n}: ${parts.join(" y ")}${talt < 0 ? " (ahora está bajo el horizonte)" : ""}`);
+        this.ghint(`${t.n}: ${parts.join(" y ")}${talt < 0 ? " (ahora está bajo el horizonte)" : ""}`);
       }
-    } else if (this.sensor) this.hint(`Mirando al ${dirName(((Math.atan2(fw[0], fw[1]) / Astro.RAD) + 360) % 360)}, a ${nf0.format(alt0)}° de altura`);
+    } else if (this.sensor) this.ghint(`Mirando al ${dirName(((Math.atan2(fw[0], fw[1]) / Astro.RAD) + 360) % 360)}, a ${nf0.format(alt0)}° de altura`);
   }
 };
 function arPointer() {
@@ -15435,6 +15475,7 @@ $("cn-q").addEventListener("input", renderConstList);
 arPointer();
 $("ar-start").addEventListener("click", () => { AR.setTarget($("ar-target-in").value); $("ar-target").value = $("ar-target-in").value; AR.start(); });
 $("ar-close").addEventListener("click", () => AR.stop());
+$("ar-sens").addEventListener("click", () => { if (AR.aos) { try { AR.aos.stop(); } catch { /* nada */ } AR.aos = null; } AR.hint("Activando sensores…"); AR.sensors(); });
 $("ar-cam").addEventListener("click", () => AR.camera(!AR.stream));
 $("ar-red").addEventListener("click", () => { S.red = !S.red; store.set("red", S.red); applyRed(); $("ar-red").setAttribute("aria-pressed", S.red ? "true" : "false"); });
 $("ar-target").addEventListener("change", () => AR.setTarget($("ar-target").value));
