@@ -259,6 +259,26 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
 #fact-list .item { cursor: pointer; }
 .btn[hidden] { display: none; }
 
+/* apunta al cielo */
+#ar { position: fixed; inset: 0; z-index: 40; background: #02030a; touch-action: none; }
+#ar[hidden] { display: none; }
+#ar video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+#ar.cam video { display: block; }
+#ar canvas { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; background: transparent; }
+.ar-top { position: absolute; top: 0; left: 0; right: 0; display: flex; gap: 6px; padding: 10px; padding-top: max(10px, env(safe-area-inset-top)); background: linear-gradient(rgba(0,0,0,.6), transparent); }
+.ar-top input { flex: 1; min-width: 0; background: rgba(20,24,44,.8); border: 1px solid rgba(255,255,255,.2); border-radius: 999px; padding: 6px 12px; color: var(--ink); }
+.ar-top .btn { background: rgba(20,24,44,.8); }
+.ar-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, 34px); font-weight: 700; text-shadow: 0 1px 4px #000; pointer-events: none; text-align: center; }
+.ar-hint { position: absolute; left: 12px; right: 12px; bottom: max(16px, env(safe-area-inset-bottom)); text-align: center; font-size: 15px; text-shadow: 0 1px 4px #000; pointer-events: none; }
+.toast, .player { z-index: 60; }
+:root.rojo #ar video { filter: grayscale(1) sepia(1) saturate(8) hue-rotate(-50deg) brightness(.5); }
+
+.loc-btn { align-self: flex-end; padding: 7px 10px; }
+.loc-btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.loc-btn.busy .ic { animation: pulso 1s ease-in-out infinite; }
+@keyframes pulso { 50% { opacity: .3; } }
+.row[hidden] { display: none; }
+
 </style>
 </head>
 <body>
@@ -275,12 +295,14 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
         <input type="time" id="in-time" step="300"></label>
       <label class="field">Lugar
         <select id="in-place"></select></label>
+      <button class="btn ghost loc-btn" id="btn-loc" type="button" hidden aria-pressed="false" aria-label="Usar mi ubicación"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg></button>
       <button class="btn ghost" id="btn-now" type="button">Ahora</button>
       <button class="btn ghost" id="btn-red" type="button" aria-pressed="false" title="Pone toda la pantalla en rojo para no perder la vista nocturna">Modo rojo</button>
     </div>
   </div>
   <nav class="tabs" aria-label="Secciones">
     <a href="#inicio" data-view="inicio"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></a>
+    <a href="#cielo" data-view="cielo"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="7" y="9" width="10" height="13" rx="2"/><path d="M12 2l1.2 2.6L16 5l-2.1 1.8.6 2.7L12 8.2 9.5 9.5l.6-2.7L8 5l2.8-.4z"/></svg><span>Apunta al cielo</span></a>
     <a href="#noche" data-view="noche"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span>Esta noche</span></a>
     <a href="#dwarf" data-view="dwarf"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 15l11-6 2 4-11 6zM15 9l3-1.5 2 4-3 1.5M9 18l-2 4M11 17l2 5"/></svg><span>Dwarf 3</span></a>
     <a href="#charla" data-view="charla"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span>Charla</span></a>
@@ -303,6 +325,7 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
     </div>
     <div class="home-grid">
       <a class="hcard big" href="#noche" data-hc="noche"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span class="hc-t">Esta noche</span><span class="hc-d">Nubes, seeing, mapa del cielo y tu lista</span><span class="hc-live" id="hc-noche"></span></a>
+      <a class="hcard" href="#cielo" data-hc="cielo"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="7" y="9" width="10" height="13" rx="2"/><path d="M12 2l1.2 2.6L16 5l-2.1 1.8.6 2.7L12 8.2 9.5 9.5l.6-2.7L8 5l2.8-.4z"/></svg><span class="hc-t">Apunta al cielo</span><span class="hc-d">Levanta el móvil y te dice qué estás viendo</span><span class="hc-live" id="hc-cielo"></span></a>
       <a class="hcard" href="#dwarf" data-hc="dwarf"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 15l11-6 2 4-11 6zM15 9l3-1.5 2 4-3 1.5M9 18l-2 4M11 17l2 5"/></svg><span class="hc-t">Dwarf 3</span><span class="hc-d">Qué fotografiar, filtro y tiempo</span><span class="hc-live" id="hc-dwarf"></span></a>
       <a class="hcard big" href="#charla" data-hc="charla"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span class="hc-t">Charla guiada</span><span class="hc-d">Lo imprescindible, lo de hoy y una leyenda</span><span class="hc-live" id="hc-charla"></span></a>
       <a class="hcard big" href="#constelaciones" data-hc="constelaciones"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 18l5-6 5 3 6-9"/><circle cx="4" cy="18" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="14" cy="15" r="1.6"/><circle cx="20" cy="6" r="1.6"/></svg><span class="hc-t">Constelaciones</span><span class="hc-d">Las 88 figuras y sus leyendas</span><span class="hc-live" id="hc-constelaciones"></span></a>
@@ -310,6 +333,20 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
       <a class="hcard" href="#catalogo" data-hc="catalogo"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M5 4h11l3 3v13H5z"/><path d="M9 10h6M9 14h6"/></svg><span class="hc-t">Catálogo</span><span class="hc-d">12.000 objetos Messier, NGC e IC</span><span class="hc-live" id="hc-catalogo"></span></a>
       <a class="hcard" href="#diario" data-hc="diario"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M6 3h11v18H6z"/><path d="M9 7h5M9 11h5"/></svg><span class="hc-t">Diario</span><span class="hc-d">Tus observaciones</span><span class="hc-live" id="hc-diario"></span></a>
       <a class="hcard" href="#ajustes" data-hc="ajustes"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg><span class="hc-t">Ajustes</span><span class="hc-d">Equipo, lugares, voz y Stellarium</span><span class="hc-live" id="hc-ajustes"></span></a>
+    </div>
+  </section>
+
+  <!-- ===================== APUNTA AL CIELO ===================== -->
+  <section class="view" id="v-cielo">
+    <div class="card">
+      <header><h2>Apunta al cielo</h2></header>
+      <p class="lead">Levanta el móvil hacia el cielo: verás las estrellas, las constelaciones, los planetas y los objetos que tienes delante, con sus nombres. Elige un objeto y una flecha te llevará hasta él.</p>
+      <div class="row">
+        <label class="field" style="flex:1;min-width:220px">Llévame a…
+          <input type="search" id="ar-target-in" list="obj-names" placeholder="Júpiter, M31, Vega, Orión…"></label>
+      </div>
+      <div class="row"><button class="btn primary" type="button" id="ar-start">Empezar</button></div>
+      <p class="muted small">Consejos: aléjate de objetos metálicos y, si la brújula se desvía, mueve el móvil dibujando un ocho en el aire para calibrarla. En el ordenador, arrastra con el ratón para mover el cielo y usa la rueda para acercar.</p>
     </div>
   </section>
 
@@ -545,6 +582,7 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
           <label class="field">Latitud<input type="number" id="p-lat" step="0.0001" min="-90" max="90" required style="width:120px"></label>
           <label class="field">Longitud<input type="number" id="p-lon" step="0.0001" min="-180" max="180" required style="width:120px"></label>
         </div>
+        <label class="row small" id="auto-loc-row" hidden><input type="checkbox" id="auto-loc"> Ubicación automática: al abrir la app usa dónde estás y se actualiza si te mueves</label>
         <div class="row"><button class="btn primary" type="submit">Añadir lugar</button><button class="btn" type="button" id="btn-gps" hidden>Usar mi ubicación (GPS)</button></div>
         <div class="list" id="place-list"></div>
       </form>
@@ -561,6 +599,18 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
   </section>
 </main>
 
+<div id="ar" hidden>
+  <video id="ar-video" playsinline muted autoplay></video>
+  <canvas id="ar-canvas" aria-label="Vista del cielo hacia donde apunta el móvil. Toca un objeto para ver su ficha."></canvas>
+  <div class="ar-top">
+    <button class="btn" type="button" id="ar-close" aria-label="Cerrar">✕ Cerrar</button>
+    <input type="search" id="ar-target" list="obj-names" placeholder="Llévame a…" aria-label="Objeto al que ir">
+    <button class="btn" type="button" id="ar-cam" aria-pressed="false">Cámara</button>
+    <button class="btn" type="button" id="ar-red" aria-pressed="false">Rojo</button>
+  </div>
+  <div class="ar-center" id="ar-center"></div>
+  <div class="ar-hint" id="ar-hint"></div>
+</div>
 <dialog id="ficha" aria-labelledby="f-title"><div class="ficha" id="ficha-body"></div></dialog>
 <div class="player" id="player"><span id="player-txt" class="small">Leyendo…</span><button class="btn" id="player-stop" type="button">Parar</button></div>
 <div class="toast" id="toast" role="status"></div>
@@ -14189,41 +14239,52 @@ async function refreshWeather(force) {
 }
 
 
-/* ===== GPS (solo Android) ===== */
-function setMyPlace(lat, lon) {
-  const pl = { name: "Mi ubicación", lat: Math.round(lat * 10000) / 10000, lon: Math.round(lon * 10000) / 10000 };
+/* ===== Ubicación (web pública y Android) ===== */
+// Con la ubicación automática activada, al abrir la app (y cada 15 min o al volver a ella) se pide la posición;
+// si te has movido más de 3 km, «Mi ubicación» se actualiza y todo se recalcula para el nuevo sitio.
+S.autoLoc = store.get("autoLoc", true);
+const placeLabel = (p = place()) => p.name === "Mi ubicación" && p.near ? `Mi ubicación (${p.near})` : p.name;
+const kmBetween = (a, b) => { const r = Astro.RAD, dLat = (b.lat - a.lat) * r, dLon = (b.lon - a.lon) * r; const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLon / 2) ** 2; return 12742 * Math.asin(Math.sqrt(h)); };
+function setMyPlace(lat, lon, silent) {
+  const pl = { name: "Mi ubicación", lat: Math.round(lat * 10000) / 10000, lon: Math.round(lon * 10000) / 10000, auto: true };
+  // nombre: el lugar guardado más cercano, si está a menos de 15 km
+  const near = S.places.filter(x => x.name !== "Mi ubicación").map(x => ({ x, d: kmBetween(pl, x) })).sort((u, v) => u.d - v.d)[0];
+  pl.near = near && near.d < 15 ? near.x.name : "";
   const i0 = S.places.findIndex(x => x.name === "Mi ubicación");
+  const old = i0 >= 0 ? S.places[i0] : null;
+  const moved = !old || kmBetween(old, pl) > 3;
+  const wasSel = i0 >= 0 && S.placeIdx === i0;
+  if (!moved && wasSel) { if (!silent) toast("Sigues en el mismo sitio"); return; }
+  if (old && !moved) pl.lat = old.lat, pl.lon = old.lon;   // menos de 3 km: no se recalcula nada
   if (i0 >= 0) S.places[i0] = pl; else S.places.unshift(pl);
   S.placeIdx = S.places.findIndex(x => x.name === "Mi ubicación");
   store.set("places", S.places); store.set("placeIdx", S.placeIdx); NIGHT_KEY = ""; Meteo.docs = [];
-  toast("Ubicación actualizada"); renderPlaces(); render(); refreshWeather(false);
+  toast(`Ubicación actualizada${pl.near ? ": cerca de " + pl.near : ""}`); renderPlaces(); render(); refreshWeather(false);
 }
-async function useGps() {
+let LOC_BUSY = false;
+async function locate(silent) {
+  if (!(ANDROID || WEB) || LOC_BUSY) return;
+  LOC_BUSY = true; $("btn-loc").classList.add("busy");
+  const done = () => { LOC_BUSY = false; $("btn-loc").classList.remove("busy"); };
   if (WEB) {
-    if (!navigator.geolocation) { toast("Este navegador no da la ubicación"); return; }
-    toast("Buscando tu ubicación…");
-    navigator.geolocation.getCurrentPosition(pos => setMyPlace(pos.coords.latitude, pos.coords.longitude),
-      () => toast("No se pudo obtener la ubicación: da permiso al navegador"), { enableHighAccuracy: false, timeout: 20000, maximumAge: 600000 });
+    if (!navigator.geolocation) { done(); if (!silent) toast("Este navegador no da la ubicación"); return; }
+    if (!silent) toast("Buscando tu ubicación…");
+    navigator.geolocation.getCurrentPosition(pos => { done(); setMyPlace(pos.coords.latitude, pos.coords.longitude, silent); },
+      () => { done(); if (!silent) toast("No se pudo obtener la ubicación: da permiso al navegador"); }, { enableHighAccuracy: false, timeout: 20000, maximumAge: silent ? 120000 : 0 });
     return;
   }
-  if (!ANDROID) return;
   try { AndroidBridge.requestLocation(); } catch { /* nada */ }
-  toast("Buscando tu ubicación…");
+  if (!silent) toast("Buscando tu ubicación…");
   for (let i = 0; i < 20; i++) {
     await new Promise(r => setTimeout(r, 1000));
     let v = ""; try { v = AndroidBridge.getLocation(); } catch { v = ""; }
-    if (v && v.includes(",")) {
-      const [lat, lon] = v.split(",").map(Number);
-      const pl = { name: "Mi ubicación", lat: Math.round(lat * 10000) / 10000, lon: Math.round(lon * 10000) / 10000 };
-      const i0 = S.places.findIndex(x => x.name === "Mi ubicación");
-      if (i0 >= 0) S.places[i0] = pl; else S.places.unshift(pl);
-      S.placeIdx = S.places.findIndex(x => x.name === "Mi ubicación");
-      store.set("places", S.places); store.set("placeIdx", S.placeIdx); NIGHT_KEY = ""; Meteo.docs = [];
-      toast("Ubicación actualizada"); renderPlaces(); render(); refreshWeather(false); return;
-    }
+    if (v && v.includes(",")) { const [lat, lon] = v.split(",").map(Number); done(); setMyPlace(lat, lon, silent); return; }
   }
-  toast("No se pudo obtener la ubicación: activa la ubicación del móvil y da permiso a Astrorus");
+  done();
+  if (!silent) toast("No se pudo obtener la ubicación: activa la ubicación del móvil y da permiso a Astrorus");
 }
+function useGps() { S.autoLoc = true; store.set("autoLoc", true); syncLocBtn(); locate(false); }
+function syncLocBtn() { const b = $("btn-loc"); if (b) { b.setAttribute("aria-pressed", S.autoLoc ? "true" : "false"); b.title = S.autoLoc ? "Ubicación automática activada: pulsa para actualizarla ahora" : "Usar mi ubicación"; } const c = $("auto-loc"); if (c) c.checked = S.autoLoc; }
 
 function renderMeteo() {
   const el = $("meteo-body"); if (el) el.innerHTML = meteoSummaryHtml(false);
@@ -14269,7 +14330,7 @@ function renderTiles() {
     ["Luna", `${nf0.format(ph.illum * 100)} %`, moonTileText(n)],
     ["Sin Luna y oscuro", moonFree.txt, moonFree.sub]
   ].map(([k, v, d]) => `<div class="tile"><span class="k">${k}</span><span class="v">${v}</span><span class="d">${esc(d)}</span></div>`).join("");
-  $("brand-sub").textContent = `${fmtD(n.date)} · ${place().name}`;
+  $("brand-sub").textContent = `${fmtD(n.date)} · ${placeLabel()}`;
 }
 function moonTileText(n) {
   const inN = t => t && t >= n.sunset && t <= n.sunrise;
@@ -14595,7 +14656,7 @@ function renderCharla() {
 }
 function charlaScript() {
   let last = "";
-  return `Charla de observación · ${fmtD(getNight().date)} · ${place().name}\n` + CHARLA.map(s => { const h = s.block !== last ? `\n== ${CH_BLOCKS[s.block][0].toUpperCase()} ==\n` : ""; last = s.block; return `${h}${fmtT(s.t)} · ${s.title}\n${s.look} ${s.see}\n${s.text}\n`; }).join("\n");
+  return `Charla de observación · ${fmtD(getNight().date)} · ${placeLabel()}\n` + CHARLA.map(s => { const h = s.block !== last ? `\n== ${CH_BLOCKS[s.block][0].toUpperCase()} ==\n` : ""; last = s.block; return `${h}${fmtT(s.t)} · ${s.title}\n${s.look} ${s.see}\n${s.text}\n`; }).join("\n");
 }
 function highlightStop(i) {
   document.querySelectorAll(".stop.speaking").forEach(e => e.classList.remove("speaking"));
@@ -14656,7 +14717,7 @@ function fillDiaryForm(e) {
 
 /* ================== Ajustes ================== */
 function renderPlaces() {
-  $("in-place").innerHTML = S.places.map((p, i) => `<option value="${i}">${esc(p.name)}</option>`).join("");
+  $("in-place").innerHTML = S.places.map((p, i) => `<option value="${i}">${esc(p.name === "Mi ubicación" && p.near ? "Mi ubicación (" + p.near + ")" : p.name)}</option>`).join("");
   $("in-place").value = String(Math.min(S.placeIdx, S.places.length - 1));
   $("place-list").innerHTML = S.places.map((p, i) => `<div class="item"><span class="t">${esc(p.name)}</span>
     <button class="btn ghost" type="button" data-del-place="${i}" ${S.places.length < 2 ? "disabled" : ""}>Quitar</button>
@@ -14847,6 +14908,7 @@ function openFicha(o) {
       <button class="btn ghost" type="button" id="f-close">Cerrar</button></div>
     <div class="row"><button class="btn primary" type="button" id="f-say">Escuchar la ficha</button>
       <a class="btn" href="${stelWeb(o)}" target="_blank" rel="noopener">Ver en Stellarium Web</a>
+      <button class="btn" type="button" id="f-find">Buscar en el cielo</button>
       <button class="btn" type="button" id="f-stel">Copiar para Stellarium</button>
       ${isDso ? `<button class="btn" type="button" id="f-plan">Añadir al plan del Dwarf</button>` : ""}
       ${isDso ? `<label class="btn"><input type="checkbox" data-sel="${o.key}" ${S.sel.has(o.key) ? "checked" : ""}> En mi lista</label>` : ""}</div>
@@ -14869,6 +14931,7 @@ function openFicha(o) {
   $("f-close").onclick = () => { dlg.close(); };
   $("f-say").onclick = () => Voice.say(say);
   $("f-stel").onclick = () => copy(stelScript(o));
+  $("f-find").onclick = () => { $("ficha").close(); AR.target = { o, n: shortLabel(o) }; $("ar-target").value = shortLabel(o); if (AR.on) AR.refreshBodies(new Date()); else AR.start(); };
   if (isDso) $("f-plan").onclick = () => addToPlan(o);
   if (SAMPLE) {
     $("f-ask").hidden = false;
@@ -14910,7 +14973,7 @@ document.addEventListener("input", e => {
 /* ================== Inicio ================== */
 function renderHome() {
   const n = getNight(), p = place(), ph = n.phase;
-  $("home-date").textContent = `${fmtD(n.date)} · ${p.name}`;
+  $("home-date").textContent = `${fmtD(n.date)} · ${placeLabel(p)}`;
   let w = null; try { w = meteoNight(); } catch { w = null; }
   const sky = w && !w.none ? w.verdict : null;
   $("home-title").textContent = sky ? (w.cls === "good" ? "Esta noche se puede observar" : w.cls === "warn" ? "Esta noche, a ratos" : "Esta noche, nubes") : "El cielo de esta noche";
@@ -14931,6 +14994,7 @@ function renderHome() {
     charla: leg ? `Leyenda de hoy: ${consName(leg)}` : "",
     constelaciones: leg ? `Esta noche: ${consName(leg)}` : "",
     aprende: ALL_FACTS[factOfDay()].t,
+    cielo: "Como Stellarium, en tu móvil",
     catalogo: `${nf0.format(OBJECTS.length)} objetos`,
     diario: `${Data.diary.length} ${Data.diary.length === 1 ? "observación" : "observaciones"}`,
     ajustes: activeScopeName()
@@ -15074,9 +15138,236 @@ document.addEventListener("click", e => {
   const f = e.target.closest("[data-fact]"); if (f) { FACT_I = +f.dataset.fact; renderFacts(); $("v-aprende").scrollIntoView({ behavior: "smooth" }); }
 });
 
+/* ================== Apunta al cielo ================== */
+const AR = {
+  on: false, raf: 0, sensor: false, lastEv: 0, fov: 60, drag: null,
+  az: 180, alt: 35,                        // modo arrastrar (sin sensores)
+  R: null, iosOff: null, target: null, pts: [], stars: null, M: null, mT: 0, bodies: [], bT: 0,
+  init() {
+    if (this.stars) return;
+    const v = (ra, de) => { ra *= Astro.RAD; de *= Astro.RAD; return [Math.cos(de) * Math.cos(ra), Math.cos(de) * Math.sin(ra), Math.sin(de)]; };
+    this.stars = []; this.lines = []; this.cnames = [];
+    for (const [c, g] of Object.entries(CONST_GEO)) {
+      for (const st of g.s) this.stars.push({ e: v(st[0], st[1]), m: st[2], n: st[3] || "" });
+      for (const pl of g.l) { const seg = []; for (let i = 0; i < pl.length; i += 2) seg.push(v(pl[i], pl[i + 1])); this.lines.push(seg); }
+      this.cnames.push({ e: v(g.p[0], g.p[1]), n: consName(c), c });
+    }
+    this.dsos = OBJECTS.filter(o => o.kind === "dso" && (/^M\d/.test(o.id))).map(o => ({ o, e: v(o.ra, o.dec) }));
+  },
+  // ecuatoriales (J2000) → este, norte, arriba del lugar
+  matrix(d) {
+    const p = place(), lst = (Astro.gmst(d) + p.lon) * Astro.RAD, la = p.lat * Astro.RAD;
+    const sL = Math.sin(lst), cL = Math.cos(lst), sp = Math.sin(la), cp = Math.cos(la);
+    return [[-sL, cL, 0], [-sp * cL, -sp * sL, cp], [cp * cL, cp * sL, sp]];
+  },
+  mul: (M, e) => [M[0][0] * e[0] + M[0][1] * e[1] + M[0][2] * e[2], M[1][0] * e[0] + M[1][1] * e[1] + M[1][2] * e[2], M[2][0] * e[0] + M[2][1] * e[1] + M[2][2] * e[2]],
+  enu: (alt, az) => { alt *= Astro.RAD; az *= Astro.RAD; return [Math.cos(alt) * Math.sin(az), Math.cos(alt) * Math.cos(az), Math.sin(alt)]; },
+  refreshBodies(now) {
+    const p = place();
+    this.bodies = OBJECTS.filter(o => o.kind === "planet" || o.kind === "moon").map(o => { const h = horiz(o, now, p); return { o, w: this.enu(h.alt, h.az) }; });
+    const sn = Astro.sun(now), sh = Astro.altAz(sn.ra, sn.dec, now, p.lat, p.lon);
+    this.bodies.push({ sun: true, w: this.enu(sh.alt, sh.az) });
+    const sel = [...S.sel].map(k => BY_KEY[k]).filter(o => o && o.kind !== "planet" && o.kind !== "moon");
+    this.mine = sel.map(o => { const h = horiz(o, now, p); return { o, w: this.enu(h.alt, h.az) }; });
+    if (this.target) {
+      const t = this.target;
+      if (t.cn) { const g = CONST_GEO[t.cn]; const r = Astro.precess(g.p[0], g.p[1], now); const h = Astro.altAz(r.ra, r.dec, now, p.lat, p.lon); t.w = this.enu(h.alt, h.az); }
+      else { const h = horiz(t.o, now, p); t.w = this.enu(h.alt, h.az); }
+    }
+  },
+  // orientación del móvil (W3C: alpha, beta, gamma) → vectores derecha, arriba y detrás de la pantalla en el marco este-norte-arriba
+  fromEuler(a, b, g) {
+    const r = Astro.RAD, ca = Math.cos(a * r), sa = Math.sin(a * r), cb = Math.cos(b * r), sb = Math.sin(b * r), cg = Math.cos(g * r), sg = Math.sin(g * r);
+    const m = [[ca * cg - sa * sb * sg, -cb * sa, ca * sg + cg * sa * sb], [cg * sa + ca * sb * sg, ca * cb, sa * sg - ca * cg * sb], [-cb * sg, sb, cb * cg]];
+    const col = i => [m[0][i], m[1][i], m[2][i]];
+    const ang = ((screen.orientation && screen.orientation.angle) ?? window.orientation ?? 0) * r;
+    const X = col(0), Y = col(1), Z = col(2);
+    const right = X.map((x, i) => Math.cos(ang) * x - Math.sin(ang) * Y[i]);
+    const up = X.map((x, i) => Math.sin(ang) * x + Math.cos(ang) * Y[i]);
+    return { right, up, back: Z };
+  },
+  onOrient(e) {
+    if (e.alpha == null && e.webkitCompassHeading == null) return;
+    let a = e.alpha || 0;
+    if (e.webkitCompassHeading != null) {          // iPhone: corrige alpha con la brújula
+      const off = ((360 - e.webkitCompassHeading - a) % 360 + 360) % 360;
+      if (this.iosOff == null) this.iosOff = off;
+      else { let d = ((off - this.iosOff + 540) % 360) - 180; this.iosOff = (this.iosOff + d * 0.05 + 360) % 360; }
+      a += this.iosOff;
+    } else if (!e.absolute && this.absSeen) return;
+    if (e.absolute) this.absSeen = true;
+    const R = this.fromEuler(a, e.beta || 0, e.gamma || 0);
+    if (!this.R) this.R = R;
+    else for (const k of ["right", "up", "back"]) this.R[k] = this.R[k].map((x, i) => x + (R[k][i] - x) * 0.22);
+    this.sensor = true; this.lastEv = performance.now();
+  },
+  basis() {
+    if (this.sensor && this.R) {
+      // reortogonaliza tras el suavizado
+      const n = v => { const l = Math.hypot(...v) || 1; return v.map(x => x / l); };
+      const back = n(this.R.back), up0 = this.R.up, d = up0[0] * back[0] + up0[1] * back[1] + up0[2] * back[2];
+      const up = n(up0.map((x, i) => x - d * back[i]));
+      const right = [up[1] * back[2] - up[2] * back[1], up[2] * back[0] - up[0] * back[2], up[0] * back[1] - up[1] * back[0]];
+      return { right, up, back };
+    }
+    const f = this.enu(this.alt, this.az), back = f.map(x => -x);
+    const right = [Math.cos(this.az * Astro.RAD), -Math.sin(this.az * Astro.RAD), 0];
+    const up = [back[1] * right[2] - back[2] * right[1], back[2] * right[0] - back[0] * right[2], back[0] * right[1] - back[1] * right[0]];
+    return { right, up, back };
+  },
+  async start() {
+    this.init();
+    const box = $("ar"); box.hidden = false; this.on = true; this.R = null; this.sensor = false; this.iosOff = null; this.absSeen = false;
+    document.body.style.overflow = "hidden";
+    $("ar-red").setAttribute("aria-pressed", S.red ? "true" : "false");
+    try { if (typeof DeviceOrientationEvent !== "undefined" && DeviceOrientationEvent.requestPermission) { const r = await DeviceOrientationEvent.requestPermission(); if (r === "denied") toast("Sin permiso para los sensores: arrastra el cielo con el dedo"); } } catch { /* nada */ }
+    this.h1 = e => this.onOrient(e);
+    window.addEventListener("deviceorientationabsolute", this.h1);
+    window.addEventListener("deviceorientation", this.h1);
+    this.refreshBodies(new Date()); this.M = this.matrix(new Date()); this.mT = Date.now();
+    this.hint("Levanta el móvil hacia el cielo");
+    setTimeout(() => { if (this.on && !this.sensor) this.hint("No hay sensores de orientación: arrastra para mover el cielo y pellizca o usa la rueda para acercar"); }, 1500);
+    const loop = () => { if (!this.on) return; this.draw(); this.raf = requestAnimationFrame(loop); };
+    loop();
+  },
+  stop() {
+    this.on = false; cancelAnimationFrame(this.raf);
+    window.removeEventListener("deviceorientationabsolute", this.h1); window.removeEventListener("deviceorientation", this.h1);
+    this.camera(false); $("ar").hidden = true; document.body.style.overflow = "";
+  },
+  async camera(on) {
+    const v = $("ar-video"), box = $("ar");
+    if (!on) { if (this.stream) this.stream.getTracks().forEach(t => t.stop()); this.stream = null; box.classList.remove("cam"); $("ar-cam").setAttribute("aria-pressed", "false"); return; }
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+      v.srcObject = this.stream; box.classList.add("cam"); $("ar-cam").setAttribute("aria-pressed", "true");
+    } catch { toast(ANDROID ? "Acepta el permiso de cámara y vuelve a pulsar «Cámara»" : "No se pudo abrir la cámara"); }
+  },
+  hint(t) { $("ar-hint").textContent = t; },
+  setTarget(q) {
+    const nrm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, "");
+    const k = nrm(q); if (!k) { this.target = null; return; }
+    let o = OBJECTS.find(o => nrm(shortLabel(o)) === k || nrm(o.id) === k || nrm(o.name) === k) || OBJECTS.find(o => nrm(label(o)).includes(k));
+    if (o) this.target = { o, n: shortLabel(o) };
+    else { const c = Object.keys(CONST_GEO).find(c => nrm(consName(c)) === k) || Object.keys(CONST_GEO).find(c => nrm(consName(c)).includes(k)); this.target = c ? { cn: c, n: consName(c) } : null; }
+    if (!this.target) toast("No encuentro ese objeto");
+    if (this.on) this.refreshBodies(new Date());
+  },
+  draw() {
+    const cv = $("ar-canvas"), dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+    const now = new Date();
+    if (Date.now() - this.mT > 10000) { this.M = this.matrix(now); this.mT = Date.now(); this.refreshBodies(now); }
+    const B = this.basis(), red = S.red, cam = $("ar").classList.contains("cam");
+    const f = (H / 2) / Math.tan(this.fov / 2 * Astro.RAD), cx = W / 2, cy = H / 2;
+    const P = w => { const d = -(w[0] * B.back[0] + w[1] * B.back[1] + w[2] * B.back[2]); if (d <= 0.05) return null; return [cx + (w[0] * B.right[0] + w[1] * B.right[1] + w[2] * B.right[2]) / d * f, cy - (w[0] * B.up[0] + w[1] * B.up[1] + w[2] * B.up[2]) / d * f, d]; };
+    const C = red ? { star: "#ff5b4a", line: "rgba(255,70,50,.45)", txt: "#ff5b4a", hor: "rgba(255,60,40,.7)", ground: "rgba(40,0,0,.55)", dso: "#ff5b4a", pl: "#ff7b6a" }
+      : { star: "#ffffff", line: "rgba(140,170,255,.5)", txt: "#ffcf6e", hor: "rgba(120,220,160,.8)", ground: cam ? "rgba(0,30,10,.25)" : "rgba(8,22,14,.85)", dso: "#9fd0ff", pl: "#ffd27a" };
+    if (!cam && !red) { const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#03051a"); g.addColorStop(1, "#0b1030"); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+    this.pts = [];
+    // suelo: polígono bajo el horizonte
+    const hor = []; for (let az = 0; az <= 360; az += 3) { const q = P(this.enu(0, az)); hor.push(q); }
+    x.strokeStyle = C.hor; x.lineWidth = 1.5; x.beginPath(); let st = false;
+    hor.forEach(q => { if (!q) { st = false; return; } if (!st) { x.moveTo(q[0], q[1]); st = true; } else x.lineTo(q[0], q[1]); }); x.stroke();
+    const nadir = P([0, 0, -1]);
+    if (nadir || hor.some(Boolean)) {
+      // sombreado del suelo: puntos bajo el horizonte
+      x.fillStyle = C.ground;
+      for (let az = 0; az < 360; az += 6) { const a = P(this.enu(0, az)), b = P(this.enu(0, az + 6)), c2 = P(this.enu(-45, az + 6)), d2 = P(this.enu(-45, az)); if (a && b && c2 && d2) { x.beginPath(); x.moveTo(...a.slice(0, 2)); x.lineTo(...b.slice(0, 2)); x.lineTo(...c2.slice(0, 2)); x.lineTo(...d2.slice(0, 2)); x.fill(); } const e2 = P(this.enu(-89, az)), e3 = P(this.enu(-89, az + 6)); if (c2 && d2 && e2 && e3) { x.beginPath(); x.moveTo(...d2.slice(0, 2)); x.lineTo(...c2.slice(0, 2)); x.lineTo(...e3.slice(0, 2)); x.lineTo(...e2.slice(0, 2)); x.fill(); } }
+    }
+    x.font = "700 16px Atkinson Hyperlegible, sans-serif"; x.textAlign = "center"; x.fillStyle = C.hor;
+    ["N", "NE", "E", "SE", "S", "SO", "O", "NO"].forEach((t, i) => { const q = P(this.enu(0, i * 45)); if (q) x.fillText(t, q[0], q[1] + 20); });
+    // líneas de constelaciones
+    x.strokeStyle = C.line; x.lineWidth = 1.2;
+    for (const seg of this.lines) { x.beginPath(); let s0 = false; for (const e of seg) { const q = P(this.mul(this.M, e)); if (!q) { s0 = false; continue; } if (!s0) { x.moveTo(q[0], q[1]); s0 = true; } else x.lineTo(q[0], q[1]); } x.stroke(); }
+    // estrellas
+    const k = 60 / this.fov;
+    x.fillStyle = C.star;
+    for (const s2 of this.stars) {
+      const w = this.mul(this.M, s2.e); const q = P(w); if (!q || q[0] < -20 || q[0] > W + 20 || q[1] < -20 || q[1] > H + 20) continue;
+      const r = Math.max(0.6, (5.5 - s2.m) * 0.75) * Math.sqrt(k); x.globalAlpha = w[2] < 0 ? 0.35 : 1;
+      x.beginPath(); x.arc(q[0], q[1], r, 0, 7); x.fill();
+      if (s2.n) this.pts.push({ x: q[0], y: q[1], n: s2.n, star: true, m: s2.m });
+    }
+    x.globalAlpha = 1;
+    x.font = "600 12px Atkinson Hyperlegible, sans-serif"; x.textAlign = "left"; x.fillStyle = C.txt;
+    for (const p2 of this.pts) x.fillText(p2.n, p2.x + 7, p2.y - 5);
+    // nombres de constelaciones
+    x.font = "italic 14px Instrument Serif, Georgia, serif"; x.textAlign = "center"; x.fillStyle = red ? "rgba(255,80,60,.6)" : "rgba(170,190,255,.75)";
+    for (const c of this.cnames) { const q = P(this.mul(this.M, c.e)); if (q && q[0] > 0 && q[0] < W && q[1] > 0 && q[1] < H) { x.fillText(c.n, q[0], q[1]); this.pts.push({ x: q[0], y: q[1], n: c.n, cn: c.c }); } }
+    // Messier y tu lista
+    x.lineWidth = 1.4; x.font = "600 12px Atkinson Hyperlegible, sans-serif"; x.textAlign = "left";
+    const sel = new Set(S.sel);
+    for (const d of this.dsos) {
+      const q = P(this.mul(this.M, d.e)); if (!q || q[0] < 0 || q[0] > W || q[1] < 0 || q[1] > H) continue;
+      const mine = sel.has(d.o.key); x.strokeStyle = mine ? C.txt : C.dso; x.fillStyle = x.strokeStyle;
+      x.beginPath(); x.ellipse(q[0], q[1], 6, 4, 0, 0, 7); x.stroke();
+      if (mine || this.fov < 45) x.fillText(d.o.id, q[0] + 8, q[1] + 4);
+      this.pts.push({ x: q[0], y: q[1], n: shortLabel(d.o), o: d.o });
+    }
+    for (const m of this.mine || []) { if (/^M\d/.test(m.o.id || "")) continue; const q = P(m.w); if (!q) continue; x.strokeStyle = C.txt; x.fillStyle = C.txt; x.beginPath(); x.arc(q[0], q[1], 7, 0, 7); x.stroke(); x.fillText(shortLabel(m.o), q[0] + 9, q[1] + 4); this.pts.push({ x: q[0], y: q[1], n: shortLabel(m.o), o: m.o }); }
+    // Sol, Luna y planetas
+    for (const b of this.bodies) {
+      const q = P(b.w); if (!q) continue;
+      if (b.sun) { x.fillStyle = red ? "#ff3b2b" : "#ffdd55"; x.beginPath(); x.arc(q[0], q[1], 14, 0, 7); x.fill(); x.fillStyle = C.txt; x.font = "700 13px Atkinson Hyperlegible, sans-serif"; x.fillText("Sol · ¡no mirar!", q[0] + 18, q[1] + 4); continue; }
+      const moon = b.o.kind === "moon"; x.fillStyle = moon ? (red ? "#ff5b4a" : "#e8e8e0") : C.pl;
+      x.beginPath(); x.arc(q[0], q[1], moon ? 11 : 5, 0, 7); x.fill();
+      x.font = "700 14px Atkinson Hyperlegible, sans-serif"; x.fillStyle = C.pl; x.fillText(b.o.name, q[0] + (moon ? 15 : 9), q[1] + 5);
+      this.pts.push({ x: q[0], y: q[1], n: b.o.name, o: b.o, pri: 1 });
+    }
+    // retícula central y lo que hay en el centro
+    x.strokeStyle = red ? "rgba(255,80,60,.8)" : "rgba(255,255,255,.7)"; x.lineWidth = 1.5;
+    x.beginPath(); x.arc(cx, cy, 16, 0, 7); x.moveTo(cx - 26, cy); x.lineTo(cx - 18, cy); x.moveTo(cx + 18, cy); x.lineTo(cx + 26, cy); x.moveTo(cx, cy - 26); x.lineTo(cx, cy - 18); x.moveTo(cx, cy + 18); x.lineTo(cx, cy + 26); x.stroke();
+    let best = null, bd = 50;
+    for (const p2 of this.pts) { const d = Math.hypot(p2.x - cx, p2.y - cy) - (p2.pri ? 15 : p2.cn ? -10 : 0); if (d < bd) { bd = d; best = p2; } }
+    $("ar-center").textContent = best ? best.n : "";
+    // guía hacia el objetivo
+    const fw = B.back.map(v => -v), alt0 = Math.asin(Math.max(-1, Math.min(1, fw[2]))) / Astro.RAD;
+    if (this.target && this.target.w) {
+      const t = this.target, q = P(t.w);
+      const inView = q && q[0] > 30 && q[0] < W - 30 && q[1] > 60 && q[1] < H - 60;
+      const talt = Math.asin(t.w[2]) / Astro.RAD;
+      if (inView) {
+        x.strokeStyle = C.txt; x.lineWidth = 3; x.beginPath(); x.arc(q[0], q[1], 26 + 4 * Math.sin(Date.now() / 200), 0, 7); x.stroke();
+        x.fillStyle = C.txt; x.font = "700 15px Atkinson Hyperlegible, sans-serif"; x.textAlign = "center"; x.fillText(t.n, q[0], q[1] - 34);
+        this.hint(talt < 0 ? `${t.n} está bajo el horizonte ahora` : Math.hypot(q[0] - cx, q[1] - cy) < 40 ? `¡Ahí está ${t.n}!` : `${t.n} está en el círculo`);
+      } else {
+        // dirección en la pantalla: proyecta sobre el plano de la pantalla
+        const dx = t.w[0] * B.right[0] + t.w[1] * B.right[1] + t.w[2] * B.right[2], dy = t.w[0] * B.up[0] + t.w[1] * B.up[1] + t.w[2] * B.up[2];
+        const ang = Math.atan2(-dy, dx), ex = cx + Math.cos(ang) * Math.min(W, H) * 0.36, ey = cy + Math.sin(ang) * Math.min(W, H) * 0.36;
+        x.save(); x.translate(ex, ey); x.rotate(ang); x.fillStyle = C.txt; x.beginPath(); x.moveTo(26, 0); x.lineTo(-10, -16); x.lineTo(-2, 0); x.lineTo(-10, 16); x.closePath(); x.fill(); x.restore();
+        const parts = [];
+        if (Math.abs(dx) > Math.abs(dy) * 0.5) parts.push(dx > 0 ? "gira a la derecha" : "gira a la izquierda");
+        if (Math.abs(dy) > Math.abs(dx) * 0.5) parts.push(dy > 0 ? "sube" : "baja");
+        this.hint(`${t.n}: ${parts.join(" y ")}${talt < 0 ? " (ahora está bajo el horizonte)" : ""}`);
+      }
+    } else if (this.sensor) this.hint(`Mirando al ${dirName(((Math.atan2(fw[0], fw[1]) / Astro.RAD) + 360) % 360)}, a ${nf0.format(alt0)}° de altura`);
+  }
+};
+function arPointer() {
+  const cv = $("ar-canvas"), ptrs = new Map(); let pinch = 0, moved = false;
+  cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, [e.clientX, e.clientY]); moved = false; if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); } });
+  cv.addEventListener("pointermove", e => {
+    if (!ptrs.has(e.pointerId)) return; const prev = ptrs.get(e.pointerId); ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+    if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pinch) AR.fov = Math.max(10, Math.min(100, AR.fov * pinch / d)); pinch = d; moved = true; return; }
+    const dx = e.clientX - prev[0], dy = e.clientY - prev[1]; if (Math.abs(dx) + Math.abs(dy) > 2) moved = true;
+    if (!AR.sensor) { const s = AR.fov / cv.clientHeight; AR.az = (AR.az - dx * s + 360) % 360; AR.alt = Math.max(-30, Math.min(90, AR.alt + dy * s)); }
+  });
+  const up = e => {
+    const was = ptrs.has(e.pointerId); ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = 0;
+    if (!was || moved) return;
+    const r = cv.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top;
+    let best = null, bd = 30; for (const p of AR.pts) { const d = Math.hypot(p.x - px, p.y - py); if (d < bd && (p.o || p.cn)) { bd = d; best = p; } }
+    if (best && best.o) openFicha(best.o); else if (best && best.cn) { AR.stop(); CN_SEL = best.cn; location.hash = "constelaciones"; }
+  };
+  cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", e => { ptrs.delete(e.pointerId); pinch = 0; });
+  cv.addEventListener("wheel", e => { e.preventDefault(); AR.fov = Math.max(10, Math.min(100, AR.fov * (e.deltaY > 0 ? 1.1 : 0.9))); }, { passive: false });
+}
+
 /* ================== navegación y render ================== */
 function setView(v) {
-  if (!["inicio", "noche", "dwarf", "charla", "constelaciones", "aprende", "catalogo", "diario", "ajustes"].includes(v)) v = "inicio";
+  if (!["inicio", "noche", "dwarf", "charla", "constelaciones", "aprende", "catalogo", "diario", "ajustes", "cielo"].includes(v)) v = "inicio";
   window.scrollTo(0, 0);
   S.view = v;
   document.querySelectorAll("section.view").forEach(s => s.classList.toggle("on", s.id === "v-" + v));
@@ -15130,7 +15421,7 @@ $("ficha").addEventListener("click", e => { if (e.target === $("ficha")) $("fich
 $("ficha").addEventListener("change", e => { if (e.target.matches("[data-scope-pick]")) { EQUIP.active = e.target.value; Equip.save(); if (FICHA_OBJ) openFicha(FICHA_OBJ); } });
 $("in-date").addEventListener("change", fromInputs);
 $("in-time").addEventListener("change", fromInputs);
-$("in-place").addEventListener("change", () => { S.placeIdx = +$("in-place").value; store.set("placeIdx", S.placeIdx); NIGHT_KEY = ""; if (ANDROID || WEB) { Meteo.docs = []; refreshWeather(false); } render(); });
+$("in-place").addEventListener("change", () => { S.placeIdx = +$("in-place").value; if (S.autoLoc && S.places[S.placeIdx]?.name !== "Mi ubicación") { S.autoLoc = false; store.set("autoLoc", false); syncLocBtn(); toast("Ubicación automática desactivada. Pulsa el botón de ubicación para volver a activarla"); } store.set("placeIdx", S.placeIdx); NIGHT_KEY = ""; if (ANDROID || WEB) { Meteo.docs = []; refreshWeather(false); } render(); });
 document.addEventListener("click", e => { if (e.target.closest("[data-wx-refresh]")) refreshWeather(true); });
 $("btn-now").addEventListener("click", () => { S.time = new Date(); S.follow = true; syncInputs(); NIGHT_KEY = ""; render(); });
 $("btn-red").addEventListener("click", () => { S.red = !S.red; store.set("red", S.red); applyRed(); render(); });
@@ -15141,6 +15432,12 @@ $("ch-play").addEventListener("click", () => { if (!CHARLA.length) buildCharla()
 $("ch-copy").addEventListener("click", () => copy(charlaScript()));
 $("cat-q").addEventListener("input", renderCatalog);
 $("cn-q").addEventListener("input", renderConstList);
+arPointer();
+$("ar-start").addEventListener("click", () => { AR.setTarget($("ar-target-in").value); $("ar-target").value = $("ar-target-in").value; AR.start(); });
+$("ar-close").addEventListener("click", () => AR.stop());
+$("ar-cam").addEventListener("click", () => AR.camera(!AR.stream));
+$("ar-red").addEventListener("click", () => { S.red = !S.red; store.set("red", S.red); applyRed(); $("ar-red").setAttribute("aria-pressed", S.red ? "true" : "false"); });
+$("ar-target").addEventListener("change", () => AR.setTarget($("ar-target").value));
 $("fact-say").addEventListener("click", () => { const f = ALL_FACTS[FACT_I]; Voice.say(["¿Sabías que…? " + f.t + ". " + f.d]); });
 $("fact-next").addEventListener("click", () => { let i; do { i = Math.floor(Math.random() * ALL_FACTS.length); } while (i === FACT_I); FACT_I = i; renderFacts(); });
 $("fact-today").addEventListener("click", () => { FACT_I = factOfDay(); renderFacts(); });
@@ -15159,7 +15456,15 @@ $("diary-form").addEventListener("submit", e => {
   toast("Noche guardada"); fillDiaryForm(null);
 });
 $("d-cancel").addEventListener("click", () => fillDiaryForm(null));
-if (ANDROID || WEB) { const b = $("btn-gps"); b.hidden = false; b.addEventListener("click", useGps); }
+if (ANDROID || WEB) {
+  const b = $("btn-gps"); b.hidden = false; b.addEventListener("click", useGps);
+  $("btn-loc").hidden = false; $("btn-loc").addEventListener("click", useGps);
+  $("auto-loc-row").hidden = false; $("auto-loc").addEventListener("change", e => { S.autoLoc = e.target.checked; store.set("autoLoc", S.autoLoc); syncLocBtn(); if (S.autoLoc) locate(false); });
+  syncLocBtn();
+  if (S.autoLoc) setTimeout(() => locate(true), 600);
+  setInterval(() => { if (S.autoLoc && !document.hidden) locate(true); }, 15 * 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && S.autoLoc) locate(true); });
+}
 if (WEB && "serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
 $("place-form").addEventListener("submit", e => {
   e.preventDefault();
@@ -15208,7 +15513,7 @@ let rT; window.addEventListener("resize", () => { clearTimeout(rT); rT = setTime
 
 /* ================== inicio ================== */
 $("cat-type").innerHTML = `<option value="all">Todos</option>` + Object.entries(TYPES).filter(([k]) => OBJECTS.some(o => o.type === k)).map(([k, v]) => `<option value="${k}">${v.n}</option>`).join("");
-$("obj-names").innerHTML = OBJECTS.filter(o => !o.ngc || o.en).map(o => `<option value="${esc(shortLabel(o))}">`).join("");
+$("obj-names").innerHTML = OBJECTS.filter(o => !o.ngc || o.en).map(o => `<option value="${esc(shortLabel(o))}">`).join("") + Object.keys(CONST_GEO).map(c => `<option value="${esc(consName(c))}">`).join("");
 $("voice-rate").value = S.rate;
 $("voice-note").textContent = Voice.ok ? "Buscando voces…" : "Este navegador no permite leer en voz alta.";
 if (Voice.ok) { Voice.load(); try { speechSynthesis.onvoiceschanged = () => Voice.load(); } catch { /* nada */ } }
