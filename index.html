@@ -279,6 +279,93 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
 @keyframes pulso { 50% { opacity: .3; } }
 .row[hidden] { display: none; }
 
+/* ===== v2.0 ===== */
+.night-verdict { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.night-verdict strong { margin-right: 4px; }
+.week-banner { display: block; margin-top: 8px; padding: 10px 14px; border-radius: 14px; background: color-mix(in srgb, var(--accent) 16%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); color: var(--ink); text-decoration: none; }
+.week-banner[hidden] { display: none; }
+
+/* efemérides */
+.eph-list { display: grid; gap: 10px; }
+.eph-month { font-size: 24px; color: var(--accent); margin-top: 10px; }
+.eph-item { display: grid; grid-template-columns: 58px 1fr; gap: 12px; padding: 12px; border-radius: 14px; background: var(--glass-2); border: 1px solid rgba(255,255,255,.08); }
+.eph-item.hot { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.eph-date { display: grid; justify-items: center; align-content: start; }
+.eph-date .d { font-size: 28px; font-variant-numeric: tabular-nums; line-height: 1; }
+.eph-date .w { font-size: 12px; color: var(--muted); text-transform: uppercase; }
+.eph-body { display: grid; gap: 6px; }
+.eph-body h4 { margin: 0; font-size: 17px; }
+.eph-ic { color: var(--accent); }
+.eph-body p { color: var(--muted); max-width: 75ch; }
+
+/* modo presentador */
+#pres { position: fixed; inset: 0; z-index: 45; background: #02030a; color: #f2f4fa; display: grid; grid-template-rows: auto 1fr auto; padding: 18px 28px; gap: 12px; }
+#pres[hidden] { display: none; }
+:root.rojo #pres { background: #0a0000; color: #ff5b4a; }
+.pres-top { display: flex; justify-content: space-between; font-size: 20px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
+.pres-clock { letter-spacing: 0; color: var(--muted); }
+.pres-main { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 32px; align-items: center; min-height: 0; }
+.pres-text { display: grid; gap: 14px; align-content: center; }
+.pres-time { font-size: clamp(22px, 2.6vw, 34px); color: var(--accent); font-variant-numeric: tabular-nums; }
+.pres-title { font-size: clamp(46px, 7vw, 104px); line-height: 1; }
+.pres-look { font-size: clamp(24px, 3vw, 40px); font-weight: 700; }
+.pres-body { font-size: clamp(20px, 2.2vw, 30px); line-height: 1.45; color: color-mix(in srgb, currentColor 82%, transparent); max-height: 42vh; overflow: auto; }
+.pres-vis { display: grid; place-items: center; min-height: 0; height: 100%; }
+.pres-vis canvas { width: min(100%, 62vh); height: min(100%, 62vh); aspect-ratio: 1; background: transparent; }
+.pres-compass { width: min(100%, 56vh); height: auto; }
+.pres-compass .pc-h { fill: rgba(120,140,255,.06); stroke: currentColor; stroke-opacity: .5; stroke-width: 2; }
+.pres-compass .pc-g { fill: none; stroke: currentColor; stroke-opacity: .15; }
+.pres-compass .pc-l { fill: var(--accent); font: 700 20px var(--font-body); }
+.pres-compass .pc-l.s { fill: currentColor; opacity: .5; font-size: 14px; }
+.pres-compass .pc-dot { fill: var(--accent); }
+.pres-compass .pc-ring { fill: none; stroke: var(--accent); stroke-width: 3; opacity: .6; }
+.pc-cap { text-align: center; color: var(--muted); font-size: 15px; }
+.pres-bar { display: flex; gap: 10px; align-items: center; justify-content: center; font-size: 20px; }
+.pres-bar .btn { font-size: 18px; min-height: 48px; padding: 8px 20px; }
+@media (max-width: 760px), (orientation: portrait) {
+  .pres-main { grid-template-columns: 1fr; gap: 12px; align-content: start; overflow: auto; }
+  .pres-vis canvas, .pres-compass { width: min(100%, 38vh); height: auto; }
+  #pres { padding: 12px 16px; }
+}
+
+/* ajuste del norte */
+.ar-cal { position: absolute; left: 10px; right: 10px; top: 70px; padding: 12px; border-radius: 14px; background: rgba(10,14,30,.92); border: 1px solid rgba(255,255,255,.15); display: grid; gap: 8px; }
+.ar-cal[hidden] { display: none; }
+
+/* navegación móvil: barra inferior y cabecera compacta */
+.nav-more { display: none; }
+.more-sheet[hidden] { display: none; }
+.ctl-sum { display: none; }
+@media (max-width: 700px) {
+  .brand .sub { display: none; }
+  .ctl-sum { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; padding: 9px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.05); color: var(--ink); font: inherit; font-weight: 700; font-size: 14px; text-align: left; }
+  .controls { display: none; width: 100%; }
+  .controls.open { display: flex; }
+  .topbar { padding-bottom: 10px; }
+  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; margin: 0; max-width: none; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); gap: 0; justify-content: space-around; overflow: visible;
+    background: rgba(4,6,15,.94); border-top: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(14px); }
+  :root.rojo nav.tabs { background: rgba(10,0,0,.96); }
+  nav.tabs a, .nav-more { flex: 1; flex-direction: column; gap: 2px; padding: 6px 2px; border: 0; border-radius: 10px; background: none; font-size: 11px; color: var(--muted); min-width: 0; }
+  nav.tabs a:not([data-main]) { display: none; }
+  nav.tabs a[aria-current="page"] { background: none; color: var(--accent); }
+  .nav-more { display: inline-flex; align-items: center; cursor: pointer; font-weight: 700; font: inherit; font-size: 11px; font-weight: 700; }
+  .nav-more.on { color: var(--accent); }
+  nav.tabs .ic { width: 22px; height: 22px; }
+  nav.tabs a span, .nav-more span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .more-sheet { position: fixed; left: 8px; right: 8px; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 31; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px; border-radius: 16px; background: #0c1022; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 -10px 40px rgba(0,0,0,.5); }
+  .more-sheet a { display: flex; align-items: center; gap: 8px; padding: 12px; border-radius: 12px; color: var(--ink); text-decoration: none; background: #161b33; font-weight: 700; }
+  :root.rojo .more-sheet { background: #160303; } :root.rojo .more-sheet a { background: #220606; }
+  nav.tabs .lg { display: none; } nav.tabs .sh { display: inline; }
+  main { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+  .player { bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .eph-item { grid-template-columns: 44px 1fr; }
+}
+@media (max-width: 700px) { .toast { bottom: calc(84px + env(safe-area-inset-bottom)); } }
+@media (max-width: 700px) { header.top { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(4,6,15,.75); } }
+
+nav.tabs .sh { display: none; }
+@media (max-width: 700px) { nav.tabs .sh { display: inline; } nav.tabs .lg { display: none; } }
+
 </style>
 </head>
 <body>
@@ -288,6 +375,7 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
       <h1><a href="#inicio" class="home-link">Astrorus</a></h1>
       <span class="sub" id="brand-sub">Tu noche de observación</span>
     </div>
+    <button type="button" class="ctl-sum" id="ctl-sum" aria-expanded="false"></button>
     <div class="controls">
       <label class="field">Fecha
         <input type="date" id="in-date"></label>
@@ -301,17 +389,20 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
     </div>
   </div>
   <nav class="tabs" aria-label="Secciones">
-    <a href="#inicio" data-view="inicio"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></a>
-    <a href="#cielo" data-view="cielo"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="7" y="9" width="10" height="13" rx="2"/><path d="M12 2l1.2 2.6L16 5l-2.1 1.8.6 2.7L12 8.2 9.5 9.5l.6-2.7L8 5l2.8-.4z"/></svg><span>Apunta al cielo</span></a>
-    <a href="#noche" data-view="noche"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span>Esta noche</span></a>
+    <a href="#inicio" data-view="inicio" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></a>
+    <a href="#cielo" data-view="cielo" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="7" y="9" width="10" height="13" rx="2"/><path d="M12 2l1.2 2.6L16 5l-2.1 1.8.6 2.7L12 8.2 9.5 9.5l.6-2.7L8 5l2.8-.4z"/></svg><span class="lg">Apunta al cielo</span><span class="sh">Cielo</span></a>
+    <a href="#noche" data-view="noche" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span>Esta noche</span></a>
     <a href="#dwarf" data-view="dwarf"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 15l11-6 2 4-11 6zM15 9l3-1.5 2 4-3 1.5M9 18l-2 4M11 17l2 5"/></svg><span>Dwarf 3</span></a>
-    <a href="#charla" data-view="charla"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span>Charla</span></a>
+    <a href="#charla" data-view="charla" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span>Charla</span></a>
     <a href="#constelaciones" data-view="constelaciones"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 18l5-6 5 3 6-9"/><circle cx="4" cy="18" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="14" cy="15" r="1.6"/><circle cx="20" cy="6" r="1.6"/></svg><span>Constelaciones</span></a>
+    <a href="#efemerides" data-view="efemerides"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/></svg><span>Efemérides</span></a>
     <a href="#aprende" data-view="aprende"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg><span>Aprende</span></a>
     <a href="#catalogo" data-view="catalogo"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M5 4h11l3 3v13H5z"/><path d="M9 10h6M9 14h6"/></svg><span>Catálogo</span></a>
     <a href="#diario" data-view="diario"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M6 3h11v18H6z"/><path d="M9 7h5M9 11h5"/></svg><span>Diario</span></a>
     <a href="#ajustes" data-view="ajustes"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg><span>Ajustes</span></a>
+    <button type="button" id="nav-more" class="nav-more" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Más</span></button>
   </nav>
+  <div class="more-sheet" id="more-sheet" hidden></div>
 </header>
 
 <main>
@@ -322,6 +413,7 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
       <h2 class="hero-title" id="home-title">El cielo de esta noche</h2>
       <p class="hero-sub" id="home-sub"></p>
       <div class="hero-stats" id="home-stats"></div>
+      <a class="week-banner" id="home-week" href="#efemerides" hidden></a>
     </div>
     <div class="home-grid">
       <a class="hcard big" href="#noche" data-hc="noche"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span class="hc-t">Esta noche</span><span class="hc-d">Nubes, seeing, mapa del cielo y tu lista</span><span class="hc-live" id="hc-noche"></span></a>
@@ -329,6 +421,7 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
       <a class="hcard" href="#dwarf" data-hc="dwarf"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 15l11-6 2 4-11 6zM15 9l3-1.5 2 4-3 1.5M9 18l-2 4M11 17l2 5"/></svg><span class="hc-t">Dwarf 3</span><span class="hc-d">Qué fotografiar, filtro y tiempo</span><span class="hc-live" id="hc-dwarf"></span></a>
       <a class="hcard big" href="#charla" data-hc="charla"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span class="hc-t">Charla guiada</span><span class="hc-d">Lo imprescindible, lo de hoy y una leyenda</span><span class="hc-live" id="hc-charla"></span></a>
       <a class="hcard big" href="#constelaciones" data-hc="constelaciones"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 18l5-6 5 3 6-9"/><circle cx="4" cy="18" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="14" cy="15" r="1.6"/><circle cx="20" cy="6" r="1.6"/></svg><span class="hc-t">Constelaciones</span><span class="hc-d">Las 88 figuras y sus leyendas</span><span class="hc-live" id="hc-constelaciones"></span></a>
+      <a class="hcard" href="#efemerides" data-hc="efemerides"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/></svg><span class="hc-t">Efemérides</span><span class="hc-d">Eclipses, lluvias de estrellas, conjunciones y fases de la Luna</span><span class="hc-live" id="hc-efemerides"></span></a>
       <a class="hcard" href="#aprende" data-hc="aprende"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg><span class="hc-t">¿Sabías que…?</span><span class="hc-d">Un aprendizaje nuevo cada día</span><span class="hc-live" id="hc-aprende"></span></a>
       <a class="hcard" href="#catalogo" data-hc="catalogo"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M5 4h11l3 3v13H5z"/><path d="M9 10h6M9 14h6"/></svg><span class="hc-t">Catálogo</span><span class="hc-d">12.000 objetos Messier, NGC e IC</span><span class="hc-live" id="hc-catalogo"></span></a>
       <a class="hcard" href="#diario" data-hc="diario"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M6 3h11v18H6z"/><path d="M9 7h5M9 11h5"/></svg><span class="hc-t">Diario</span><span class="hc-d">Tus observaciones</span><span class="hc-live" id="hc-diario"></span></a>
@@ -355,7 +448,9 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
     <div class="tiles" id="night-tiles"></div>
     <div class="card">
       <header><h2>Nubes y seeing</h2></header>
+      <div id="night-verdict" class="night-verdict"></div>
       <div id="meteo-body" style="display:grid;gap:10px;grid-template-columns:minmax(0,1fr)"></div>
+      <div class="row" id="trip-row" hidden><button class="btn" type="button" id="btn-trip">Preparar salida sin cobertura</button><span class="muted small" id="trip-note"></span></div>
     </div>
     <details class="card" id="flt-card">
       <summary><h2 style="display:inline">Qué mostrar</h2> <span class="muted small">tipos, catálogos y brillo para el mapa, «Lo mejor» y el Dwarf</span></summary>
@@ -441,7 +536,8 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
           <select id="ch-src"><option value="auto">Los elige Astrorus</option><option value="lista">Mi lista de esta noche</option></select></label>
       </div>
       <div class="row">
-        <button class="btn primary" id="ch-play" type="button">Leer toda la charla</button>
+        <button class="btn primary" id="ch-present" type="button">Presentar en pantalla grande</button>
+        <button class="btn" id="ch-play" type="button">Leer toda la charla</button>
         <button class="btn" id="ch-copy" type="button">Copiar el guion</button>
       </div>
       <div id="charla-list"></div>
@@ -462,6 +558,23 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
       <div class="cn-chips" id="cn-list"></div>
     </div>
     <div class="card cn-detail" id="cn-detail"></div>
+  </section>
+
+  <!-- ===================== EFEMÉRIDES ===================== -->
+  <section class="view" id="v-efemerides">
+    <div class="card">
+      <header><h2>Efemérides</h2><span class="muted small" id="eph-count"></span></header>
+      <p class="lead">Lo que va a pasar en el cielo, calculado para tu lugar: fases de la Luna, lluvias de estrellas, eclipses que se ven desde aquí, conjunciones, oposiciones, elongaciones, solsticios y equinoccios.</p>
+      <div class="row">
+        <label class="field">Desde
+          <input type="date" id="eph-from"></label>
+        <label class="field">Periodo
+          <select id="eph-days"><option value="30">30 días</option><option value="90" selected>3 meses</option><option value="365">1 año</option><option value="1095">3 años</option></select></label>
+      </div>
+      <div class="cn-chips" id="eph-f"></div>
+      <div id="eph-list" class="eph-list"></div>
+      <p class="muted small">Cálculos propios de Astrorus para el lugar elegido. Las horas son locales; las tasas de meteoros son estimaciones para un cielo oscuro.</p>
+    </div>
   </section>
 
   <!-- ===================== APRENDE ===================== -->
@@ -606,11 +719,32 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
     <button class="btn" type="button" id="ar-close" aria-label="Cerrar">✕ Cerrar</button>
     <input type="search" id="ar-target" list="obj-names" placeholder="Llévame a…" aria-label="Objeto al que ir">
     <button class="btn" type="button" id="ar-sens" hidden>Activar sensores</button>
+    <button class="btn" type="button" id="ar-calib">Ajustar norte</button>
     <button class="btn" type="button" id="ar-cam" aria-pressed="false">Cámara</button>
     <button class="btn" type="button" id="ar-red" aria-pressed="false">Rojo</button>
   </div>
   <div class="ar-center" id="ar-center"></div>
+  <div class="ar-cal" id="ar-cal" hidden></div>
   <div class="ar-hint" id="ar-hint"></div>
+</div>
+<div id="pres" hidden>
+  <div class="pres-top"><span id="pres-block"></span><span class="pres-clock" id="pres-clock"></span></div>
+  <div class="pres-main">
+    <div class="pres-text">
+      <p class="pres-time" id="pres-time"></p>
+      <h2 class="pres-title" id="pres-title"></h2>
+      <p class="pres-look" id="pres-look"></p>
+      <p class="pres-body" id="pres-body"></p>
+    </div>
+    <div class="pres-vis" id="pres-vis"></div>
+  </div>
+  <div class="pres-bar">
+    <button class="btn" type="button" id="pres-prev" aria-label="Anterior">◀</button>
+    <span id="pres-count"></span>
+    <button class="btn" type="button" id="pres-next" aria-label="Siguiente">▶</button>
+    <button class="btn" type="button" id="pres-say" aria-pressed="false">Leer en voz alta</button>
+    <button class="btn" type="button" id="pres-close">✕ Salir</button>
+  </div>
 </div>
 <dialog id="ficha" aria-labelledby="f-title"><div class="ficha" id="ficha-body"></div></dialog>
 <div class="player" id="player"><span id="player-txt" class="small">Leyendo…</span><button class="btn" id="player-stop" type="button">Parar</button></div>
@@ -13627,6 +13761,245 @@ const FACTS_DATED = {
   "12-27": { t: "Hoy nació Kepler", d: "Johannes Kepler nació el 27 de diciembre de 1571. Descubrió las leyes del movimiento de los planetas, mejoró el telescopio y escribió una de las primeras historias de ciencia ficción, «El sueño», sobre un viaje a la Luna. Su madre fue acusada de brujería y él la defendió hasta conseguir liberarla." }
 };
 
+/* ================== Efemérides (cálculo propio para el lugar elegido) ==================
+   Fases de la Luna, superlunas, lluvias de estrellas, eclipses de Sol y Luna visibles desde el lugar,
+   conjunciones, oposiciones, máximas elongaciones, solsticios y equinoccios. */
+const EPH = (() => {
+  const R = Math.PI / 180, D = 180 / Math.PI;
+  const H = 3600000, DAY = 86400000;
+  const vec = (ra, de) => [Math.cos(de * R) * Math.cos(ra * R), Math.cos(de * R) * Math.sin(ra * R), Math.sin(de * R)];
+  const ang = (a, b) => { const d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2], la = Math.hypot(...a), lb = Math.hypot(...b); return Math.acos(Math.max(-1, Math.min(1, d / la / lb))) * D; };
+  const sepRD = (r1, d1, r2, d2) => ang(vec(r1, d1), vec(r2, d2));
+  const PLANETS = ["mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune"];
+  const PN = { mercury: "Mercurio", venus: "Venus", mars: "Marte", jupiter: "Júpiter", saturn: "Saturno", uranus: "Urano", neptune: "Neptuno" };
+  const sunAltAt = (t, p) => Astro.sunAlt(t, p.lat, p.lon);
+
+  // Lluvias de estrellas: máximo por longitud solar (IMO), THZ, radiante J2000, cuerpo progenitor
+  const SHOWERS = [
+    { n: "Cuadrántidas", ls: 283.15, zhr: 110, ra: 230, de: 49, par: "el asteroide 2003 EH1", note: "Máximo muy corto, de pocas horas" },
+    { n: "Líridas", ls: 32.32, zhr: 18, ra: 271, de: 34, par: "el cometa Thatcher" },
+    { n: "Eta Acuáridas", ls: 45.5, zhr: 50, ra: 338, de: -1, par: "el cometa Halley", note: "Se ven mejor antes del amanecer; desde España salen pocas" },
+    { n: "Delta Acuáridas del Sur", ls: 127, zhr: 25, ra: 340, de: -16, par: "el cometa 96P/Machholz", note: "Radiante bajo desde España" },
+    { n: "Perseidas", ls: 140.0, zhr: 100, ra: 48, de: 58, par: "el cometa Swift-Tuttle", note: "Las Lágrimas de San Lorenzo" },
+    { n: "Dracónidas", ls: 195.4, zhr: 10, ra: 262, de: 54, par: "el cometa Giacobini-Zinner", note: "Mejor al anochecer; algunos años da sorpresas" },
+    { n: "Oriónidas", ls: 208, zhr: 20, ra: 95, de: 16, par: "el cometa Halley" },
+    { n: "Leónidas", ls: 235.27, zhr: 15, ra: 152, de: 22, par: "el cometa Tempel-Tuttle" },
+    { n: "Gemínidas", ls: 262.2, zhr: 150, ra: 112, de: 33, par: "el asteroide Faetón", note: "La mejor lluvia del año; se ven toda la noche" },
+    { n: "Úrsidas", ls: 270.7, zhr: 10, ra: 217, de: 76, par: "el cometa Tuttle" }
+  ];
+  const STAR_TARGETS = [["aldebarán", "Aldebarán"], ["régulo", "Régulo"], ["espiga", "Espiga"], ["antares", "Antares"], ["pólux", "Pólux"]];
+
+  // instante en que la longitud del Sol cruza «lon» entre t0 y t1 (búsqueda por días y bisección)
+  function sunLonCross(lon, t0, t1) {
+    const f = t => ((Astro.sun(new Date(t)).lon - lon + 540) % 360) - 180;
+    let a = t0, fa = f(a);
+    for (let t = t0 + DAY; t <= t1 + DAY; t += DAY) {
+      const ft = f(t);
+      if (fa < 0 && ft >= 0 && ft - fa < 10) {
+        let lo = t - DAY, hi = t;
+        for (let k = 0; k < 40; k++) { const m = (lo + hi) / 2; if (f(m) < 0) lo = m; else hi = m; }
+        return new Date((lo + hi) / 2);
+      }
+      fa = ft; a = t;
+    }
+    return null;
+  }
+  // mínimo de una función cerca de t (pasos decrecientes)
+  function refineMin(f, t, span, step) {
+    let best = t, bv = f(t);
+    for (let s = step; s >= 60000; s /= 4) {
+      const lo = best - span, hi = best + span;
+      for (let x = lo; x <= hi; x += s) { const v = f(x); if (v < bv) { bv = v; best = x; } }
+      span = s;
+    }
+    return { t: best, v: bv };
+  }
+  // ventana de la noche en que algo es visible: horas con Sol < -8° y altura > minAlt
+  function nightVisibility(dayT, p, altFn, minAlt = 8) {
+    const n0 = new Date(dayT); if (n0.getHours() < 12) n0.setDate(n0.getDate() - 1); n0.setHours(17, 0, 0, 0);
+    let best = null, first = null, last = null;
+    for (let t = n0.getTime(); t < n0.getTime() + 15 * H; t += 20 * 60000) {
+      const d = new Date(t);
+      if (sunAltAt(d, p) > -8) continue;
+      const a = altFn(d);
+      if (a > minAlt) { if (!first) first = d; last = d; if (!best || a > best.alt) best = { t: d, alt: a }; }
+    }
+    return best ? { best, first, last } : null;
+  }
+  const planetAltAz = (k, d, p) => { const pl = Astro.planet(k, d); return Astro.altAz(pl.ra, pl.dec, d, p.lat, p.lon); };
+
+  // ---------- eclipses ----------
+  function solarEclipse(nm, p) {
+    const lst = d => (Astro.gmst(d) + p.lon) * R, la = p.lat * R, RE = 6378.14;
+    const geo = t => {
+      const d = new Date(t), m = Astro.moon(d), s = Astro.sun(d);
+      const M = vec(m.ra, m.dec).map(x => x * m.dist), th = lst(d);
+      const O = [RE * Math.cos(la) * Math.cos(th), RE * Math.cos(la) * Math.sin(th), RE * Math.sin(la)];
+      const Mt = M.map((x, i) => x - O[i]), dm = Math.hypot(...Mt);
+      const S = vec(s.ra, s.dec), ds = s.dist * 149597870.7;
+      return { sep: ang(Mt, S), sm: Math.asin(1737.4 / dm) * D, ss: Math.asin(696000 / ds) * D };
+    };
+    const f = t => geo(t).sep;
+    const m = refineMin(f, nm.getTime(), 5 * H, 4 * 60000);
+    const g = geo(m.t);
+    if (g.sep >= g.sm + g.ss) return null;
+    // contactos
+    const inE = t => { const x = geo(t); return x.sep < x.sm + x.ss; };
+    let c1 = m.t, c4 = m.t;
+    while (inE(c1 - 60000)) c1 -= 60000;
+    while (inE(c4 + 60000)) c4 += 60000;
+    const altMax = sunAltAt(new Date(m.t), p), alt1 = sunAltAt(new Date(c1), p), alt4 = sunAltAt(new Date(c4), p);
+    if (altMax < -0.8 && alt1 < -0.8 && alt4 < -0.8) return null;
+    const mag = (g.sm + g.ss - g.sep) / (2 * g.ss);
+    let type = "parcial";
+    if (g.sep < Math.abs(g.sm - g.ss)) type = g.sm > g.ss ? "total" : "anular";
+    return { kind: "eclipse-sol", t: new Date(m.t), c1: new Date(c1), c4: new Date(c4), mag, type, altMax, alt1, alt4 };
+  }
+  function lunarEclipse(fm, p) {
+    const geo = t => {
+      const d = new Date(t), m = Astro.moon(d), s = Astro.sun(d);
+      const sep = sepRD(m.ra, m.dec, (s.ra + 180) % 360, -s.dec);
+      const pm = Math.asin(6378.14 / m.dist) * D, ps = 8.794 / 3600 / s.dist, ss = Math.asin(696000 / (s.dist * 149597870.7)) * D;
+      const sm = Math.asin(1737.4 / m.dist) * D;
+      return { sep, sm, umb: 1.02 * (pm + ps - ss), pen: 1.02 * (pm + ps + ss) };
+    };
+    const m = refineMin(t => geo(t).sep, fm.getTime(), 5 * H, 4 * 60000);
+    const g = geo(m.t);
+    if (g.sep >= g.pen + g.sm) return null;
+    const umag = (g.umb + g.sm - g.sep) / (2 * g.sm);
+    const type = g.sep < g.umb - g.sm ? "total" : g.sep < g.umb + g.sm ? "parcial" : "penumbral";
+    // fases parciales (sombra): inicio y fin
+    let u1 = null, u4 = null;
+    if (type !== "penumbral") {
+      const inU = t => { const x = geo(t); return x.sep < x.umb + x.sm; };
+      u1 = m.t; u4 = m.t;
+      while (inU(u1 - 60000)) u1 -= 60000;
+      while (inU(u4 + 60000)) u4 += 60000;
+    }
+    const moonAlt = t => Astro.moonAltAz(new Date(t), p.lat, p.lon).alt;
+    const visMax = moonAlt(m.t) > 0, vis1 = u1 ? moonAlt(u1) > 0 : false, vis4 = u4 ? moonAlt(u4) > 0 : false;
+    if (!visMax && !vis1 && !vis4) return null;
+    return { kind: "eclipse-luna", t: new Date(m.t), u1: u1 && new Date(u1), u4: u4 && new Date(u4), umag, type, visMax, moonAltMax: moonAlt(m.t) };
+  }
+
+  // ---------- cálculo principal ----------
+  function compute(start, days, p) {
+    const t0 = start.getTime(), t1 = t0 + days * DAY, out = [];
+    const push = e => { if (e.t.getTime() >= t0 && e.t.getTime() <= t1) out.push(e); };
+    // fases de la Luna, superlunas y eclipses
+    const PH = [[0, "Luna nueva"], [90, "Cuarto creciente"], [180, "Luna llena"], [270, "Cuarto menguante"]];
+    for (const [tg, nm] of PH) {
+      let t = new Date(t0 - 2 * DAY);
+      for (let i = 0; i < Math.ceil(days / 29.5) + 2; i++) {
+        const d = Astro.nextPhase(t, tg); if (!d) break;
+        if (d.getTime() > t1) break;
+        const dist = Astro.moon(d).dist;
+        const e = { kind: "luna", t: d, title: nm, phase: tg, dist };
+        if (tg === 180 && dist < 360000) { e.title = "Superluna llena"; e.super = true; }
+        push(e);
+        if (tg === 0) { const ec = solarEclipse(d, p); if (ec) push(ec); }
+        if (tg === 180) { const ec = lunarEclipse(d, p); if (ec) push(ec); }
+        t = new Date(d.getTime() + 2 * DAY);
+      }
+    }
+    // solsticios y equinoccios
+    [[0, "Equinoccio de primavera"], [90, "Solsticio de verano"], [180, "Equinoccio de otoño"], [270, "Solsticio de invierno"]].forEach(([l, n]) => {
+      const d = sunLonCross(l, t0 - DAY, t1); if (d) push({ kind: "estacion", t: d, title: n, lon: l });
+    });
+    // lluvias de estrellas
+    for (const sh of SHOWERS) {
+      const d = sunLonCross(sh.ls, t0 - DAY, t1); if (!d) continue;
+      // noche del máximo: de la tarde anterior al amanecer
+      const night = new Date(d); if (night.getHours() < 12) night.setDate(night.getDate() - 1); night.setHours(12, 0, 0, 0);
+      const ph = Astro.moonPhase(d);
+      let radBest = null, moonUp = 0, dark = 0;
+      for (let t = night.getTime() + 6 * H; t < night.getTime() + 19 * H; t += 30 * 60000) {
+        const x = new Date(t); if (sunAltAt(x, p) > -12) continue;
+        dark++;
+        const r = Astro.precess(sh.ra, sh.de, x), a = Astro.altAz(r.ra, r.dec, x, p.lat, p.lon).alt;
+        if (!radBest || a > radBest.alt) radBest = { t: x, alt: a };
+        if (Astro.moonAltAz(x, p.lat, p.lon).alt > 0) moonUp++;
+      }
+      const moonFrac = dark ? moonUp / dark : 0;
+      const moonBad = ph.illum > 0.5 && moonFrac > 0.5;
+      const rate = radBest && radBest.alt > 0 ? Math.round(sh.zhr * Math.sin(radBest.alt * R) * (moonBad ? 0.4 : ph.illum > 0.3 && moonFrac > 0.3 ? 0.7 : 1)) : 0;
+      push({ kind: "lluvia", t: d, title: sh.n, sh, illum: ph.illum, moonFrac, moonBad, radBest, rate, night });
+    }
+    // conjunciones, oposiciones y elongaciones (muestreo cada 6 h)
+    const step = 6 * H, N = Math.ceil((t1 - t0) / step) + 2;
+    const samples = [];
+    for (let i = -1; i < N; i++) {
+      const d = new Date(t0 + i * step), s = Astro.sun(d), m = Astro.moon(d);
+      const pl = {}; PLANETS.forEach(k => pl[k] = Astro.planet(k, d));
+      samples.push({ t: d.getTime(), s, m, pl });
+    }
+    const minima = (fn, thr) => {
+      const v = samples.map(fn), res = [];
+      for (let i = 1; i < v.length - 1; i++) if (v[i] <= v[i - 1] && v[i] < v[i + 1] && v[i] < thr) res.push(i);
+      return res;
+    };
+    const bright = ["mercury", "venus", "mars", "jupiter", "saturn"];
+    // Luna con planetas y estrellas
+    for (const k of bright) {
+      for (const i of minima(x => sepRD(x.m.ra, x.m.dec, x.pl[k].ra, x.pl[k].dec), 4.5)) {
+        const r = refineMin(t => { const d = new Date(t), m = Astro.moon(d), q = Astro.planet(k, d); return sepRD(m.ra, m.dec, q.ra, q.dec); }, samples[i].t, 6 * H, 30 * 60000);
+        const vis = nightVisibility(r.t, p, d => Math.min(planetAltAz(k, d, p).alt, Astro.moonAltAz(d, p.lat, p.lon).alt));
+        if (!vis) continue;
+        const d = new Date(vis.best.t), m = Astro.moon(d), q = Astro.planet(k, d);
+        push({ kind: "conj", t: new Date(r.t), title: `La Luna junto a ${PN[k]}`, a: "luna", b: k, sep: r.v, sepVis: sepRD(m.ra, m.dec, q.ra, q.dec), vis });
+      }
+    }
+    for (const [key, nm] of STAR_TARGETS) {
+      const o = BY_KEY[key]; if (!o) continue;
+      for (const i of minima(x => sepRD(x.m.ra, x.m.dec, o.ra, o.dec), 2.5)) {
+        const r = refineMin(t => { const d = new Date(t), m = Astro.moon(d), q = Astro.precess(o.ra, o.dec, d); return sepRD(m.ra, m.dec, q.ra, q.dec); }, samples[i].t, 6 * H, 30 * 60000);
+        const vis = nightVisibility(r.t, p, d => { const q = Astro.precess(o.ra, o.dec, d); return Math.min(Astro.altAz(q.ra, q.dec, d, p.lat, p.lon).alt, Astro.moonAltAz(d, p.lat, p.lon).alt); });
+        if (!vis) continue;
+        push({ kind: "conj", t: new Date(r.t), title: `La Luna junto a ${nm}`, a: "luna", b: key, sep: r.v, vis });
+      }
+    }
+    // Luna y Pléyades
+    const m45 = OBJECTS.find(o => o.id === "M45");
+    if (m45) for (const i of minima(x => sepRD(x.m.ra, x.m.dec, m45.ra, m45.dec), 3)) {
+      const r = refineMin(t => { const d = new Date(t), m = Astro.moon(d), q = Astro.precess(m45.ra, m45.dec, d); return sepRD(m.ra, m.dec, q.ra, q.dec); }, samples[i].t, 6 * H, 30 * 60000);
+      const vis = nightVisibility(r.t, p, d => { const q = Astro.precess(m45.ra, m45.dec, d); return Math.min(Astro.altAz(q.ra, q.dec, d, p.lat, p.lon).alt, Astro.moonAltAz(d, p.lat, p.lon).alt); });
+      if (vis) push({ kind: "conj", t: new Date(r.t), title: "La Luna junto a las Pléyades", a: "luna", b: m45.key, sep: r.v, vis });
+    }
+    // entre planetas
+    for (let x = 0; x < bright.length; x++) for (let y = x + 1; y < bright.length; y++) {
+      const A = bright[x], B = bright[y];
+      for (const i of minima(z => sepRD(z.pl[A].ra, z.pl[A].dec, z.pl[B].ra, z.pl[B].dec), 2.5)) {
+        const r = refineMin(t => { const d = new Date(t), a = Astro.planet(A, d), b = Astro.planet(B, d); return sepRD(a.ra, a.dec, b.ra, b.dec); }, samples[i].t, 12 * H, 2 * H);
+        const vis = nightVisibility(r.t, p, d => Math.min(planetAltAz(A, d, p).alt, planetAltAz(B, d, p).alt), 5);
+        if (!vis) continue;
+        push({ kind: "conj", t: new Date(r.t), title: `${PN[A]} y ${PN[B]} juntos`, a: A, b: B, sep: r.v, vis, planets: true });
+      }
+    }
+    // oposiciones y máximas elongaciones
+    const elong = (x, k) => sepRD(x.s.ra, x.s.dec, x.pl[k].ra, x.pl[k].dec);
+    for (const k of ["mars", "jupiter", "saturn", "uranus", "neptune"]) {
+      const v = samples.map(x => elong(x, k));
+      for (let i = 1; i < v.length - 1; i++) if (v[i] >= v[i - 1] && v[i] > v[i + 1] && v[i] > 170) {
+        const r = refineMin(t => { const d = new Date(t), s = Astro.sun(d), q = Astro.planet(k, d); return -sepRD(s.ra, s.dec, q.ra, q.dec); }, samples[i].t, 2 * DAY, 6 * H);
+        const q = Astro.planet(k, new Date(r.t));
+        push({ kind: "oposicion", t: new Date(r.t), title: `Oposición de ${PN[k]}`, b: k, mag: q.mag, size: q.sizeArcsec, distAU: q.distAU });
+      }
+    }
+    for (const k of ["mercury", "venus"]) {
+      const v = samples.map(x => elong(x, k));
+      for (let i = 1; i < v.length - 1; i++) if (v[i] >= v[i - 1] && v[i] > v[i + 1] && v[i] > 15) {
+        const r = refineMin(t => { const d = new Date(t), s = Astro.sun(d), q = Astro.planet(k, d); return -sepRD(s.ra, s.dec, q.ra, q.dec); }, samples[i].t, 2 * DAY, 6 * H);
+        const d = new Date(r.t), s = Astro.sun(d), q = Astro.planet(k, d);
+        const east = ((q.ra - s.ra + 540) % 360) - 180 > 0;
+        push({ kind: "elong", t: d, title: `Máxima elongación ${east ? "este" : "oeste"} de ${PN[k]}`, b: k, elong: -r.v, east, mag: q.mag });
+      }
+    }
+    out.sort((a, b) => a.t - b.t);
+    return out;
+  }
+  return { compute, SHOWERS, PN };
+})();
+
 /* ================== utilidades ================== */
 // En la app de Android existe window.AndroidBridge (voz, tiempo, GPS y portapapeles nativos)
 const ANDROID = typeof window.AndroidBridge !== "undefined";
@@ -14235,7 +14608,11 @@ async function refreshWeather(force) {
   const doc = await fetchWeather(p);
   WX.busy = false; Meteo.loading = false;
   if (doc) { store.set("wx." + key, doc); Meteo.docs = [doc]; Meteo.state = "ok"; }
-  else if (!cache) Meteo.state = "sin-red";
+  else if (!cache) {
+    // sin conexión: usar la previsión guardada de un lugar cercano (hasta 35 km)
+    const near = S.places.map(q => store.get("wx." + placeKey(q), null)).filter(Boolean);
+    if (near.length) { Meteo.docs = near; Meteo.state = "ok"; } else Meteo.state = "sin-red";
+  }
   renderMeteo();
 }
 
@@ -14290,7 +14667,9 @@ function syncLocBtn() { const b = $("btn-loc"); if (b) { b.setAttribute("aria-pr
 function renderMeteo() {
   const el = $("meteo-body"); if (el) el.innerHTML = meteoSummaryHtml(false);
   const el2 = $("dwarf-meteo"); if (el2) el2.innerHTML = meteoSummaryHtml(true);
+  renderNightVerdict(); renderTripNote();
   if (S.view === "inicio") renderHome();
+  if (S.view === "noche" && $("best-table").innerHTML) renderBest();
 }
 const Places = {
   doc: null,
@@ -14372,11 +14751,11 @@ function nightList() {
 }
 function renderBest() {
   const all = nightList(), list = all.slice(0, S.listN);
-  $("best-table").innerHTML = list.length ? `<thead><tr><th>Ver</th><th>Objeto</th><th>Tipo</th><th>Mejor hora</th><th>Altura máx.</th><th>Por encima de 30°</th><th>Luna</th></tr></thead><tbody>` +
+  $("best-table").innerHTML = list.length ? `<thead><tr><th>Ver</th><th>Objeto</th><th>Tipo</th><th>Mejor hora</th><th>Altura máx.</th><th>Por encima de 30°</th><th>Esta noche</th></tr></thead><tbody>` +
     list.map(({ o, t }) => `<tr><td><input type="checkbox" data-sel="${o.key}" ${S.sel.has(o.key) ? "checked" : ""} aria-label="Ver ${esc(shortLabel(o))} en el mapa" style="width:22px;height:22px"></td>
       <td class="click" data-key="${o.key}" style="cursor:pointer"><div class="name">${esc(shortLabel(o))}</div><div class="alt">${esc(o.name && o.id.startsWith("M") ? o.name : o.en || CONS[o.con] || "")}</div></td>
       <td><span class="chip" style="color:${TYPES[o.type].c}"><span class="dot"></span>${TYPES[o.type].n}</span></td>
-      <td>${fmtT(t.maxT)}</td><td>${nf0.format(t.maxAlt)}°</td><td>${t.wStart ? `${fmtT(t.wStart)} – ${fmtT(t.wEnd)}` : "No llega a 30°"}</td><td>${moonChip(t)}</td></tr>`).join("") + `</tbody>`
+      <td>${fmtT(t.maxT)}</td><td>${nf0.format(t.maxAlt)}°</td><td>${t.wStart ? `${fmtT(t.wStart)} – ${fmtT(t.wEnd)}` : "No llega a 30°"}</td><td>${verdictChip(o, t)}</td></tr>`).join("") + `</tbody>`
     : `<tbody><tr><td class="empty">${S.listOnly ? "Todavía no has marcado ningún objeto." : "Ningún objeto cumple los filtros de «Qué mostrar» esta noche."}</td></tr></tbody>`;
   $("list-more").hidden = all.length <= S.listN;
   updateListExtras(all);
@@ -14971,6 +15350,64 @@ document.addEventListener("input", e => {
 });
 
 
+/* ================== Veredicto por objeto ================== */
+const SEEING_TYPES = new Set(["PL", "MOON", "DS", "STAR"]);
+const FAINT_TYPES = new Set(["GS", "GE", "GL", "GI", "SC", "EN", "RN", "DN", "SNR", "PN", "G", "GG"]);
+function weatherIn(from, to) {
+  let w = null; try { w = meteoNight(); } catch { w = null; }
+  if (!w || w.none) return null;
+  const rows = w.rows.filter(r => r.t >= new Date(from.getTime() - 30 * 60000) && r.t <= new Date(to.getTime() + 30 * 60000));
+  if (!rows.length) return null;
+  return { clear: rows.filter(r => r.cloud <= 30).length / rows.length, seeing: rows.reduce((a, r) => a + r.arcsec, 0) / rows.length, hum: Math.max(...rows.map(r => r.hum)) };
+}
+function verdict(o, t) {
+  const from = t.wStart || (t.maxT ? new Date(t.maxT.getTime() - 3600000) : null), to = t.wEnd || (t.maxT ? new Date(t.maxT.getTime() + 3600000) : null);
+  if (!from || t.maxAlt < 10) return { cls: "bad", txt: "Muy bajo", why: "" };
+  const w = weatherIn(from, to);
+  if (w && w.clear < 0.3) return { cls: "bad", txt: "Nublado", why: "" };
+  const why = [];
+  let lvl = 2;
+  if (w && w.clear < 0.7) { lvl = Math.min(lvl, 1); why.push("claros a ratos"); }
+  if (SEEING_TYPES.has(o.type) && w) {
+    if (w.seeing >= 3.5) { lvl = 0; why.push("seeing malo"); }
+    else if (w.seeing >= 2.5) { lvl = Math.min(lvl, 1); why.push("seeing flojo"); }
+    else if (w.seeing < 1.8) why.push("seeing bueno");
+  }
+  if (FAINT_TYPES.has(o.type)) {
+    if (t.moonHit >= 0.45) { lvl = 0; why.push("la Luna molesta"); }
+    else if (t.moonHit >= 0.15) { lvl = Math.min(lvl, 1); why.push("algo de Luna"); }
+    if (w && w.hum >= 90) { lvl = Math.min(lvl, 1); why.push("humedad alta"); }
+  } else if (["OC", "GC"].includes(o.type) && t.moonHit >= 0.45) { lvl = Math.min(lvl, 1); why.push("algo de Luna"); }
+  if (!t.wStart) { lvl = Math.min(lvl, 1); why.push("no sube de 30°"); }
+  return { cls: ["bad", "warn", "good"][lvl], txt: ["Mal", "Regular", w ? "Muy bien" : "Bien"][lvl], why: why.join(", ") };
+}
+function verdictChip(o, t) {
+  const v = verdict(o, t);
+  return `<span class="chip ${v.cls}"><span class="dot"></span>${v.txt}</span>${v.why ? `<div class="alt">${esc(v.why)}</div>` : ""}`;
+}
+function nightSummary() {
+  const n = getNight(); let w = null; try { w = meteoNight(); } catch { w = null; }
+  if (w && !w.none && w.cls === "bad") return [["bad", "Nubes", "la previsión da la noche nublada"]];
+  const out = [];
+  const inN = t => t && t >= n.sunset && t <= n.sunrise;
+  const moonUp = n.moonTrack.some((a, i) => a > 0 && n.samples[i] >= n.darkStart && n.samples[i] <= n.darkEnd);
+  if (w && !w.none && w.cls === "warn") out.push(["warn", "Nubes", w.verdict]);
+  if (w && !w.none) out.push([seeingCls(w.aAvg), "Planetas, Luna y dobles", w.aAvg < 1.8 ? "seeing bueno, aguanta muchos aumentos" : w.aAvg < 2.5 ? "seeing normal" : "seeing flojo, pocos aumentos"]);
+  else out.push(["", "Planetas, Luna y dobles", "sin previsión de seeing"]);
+  if (n.phase.illum < 0.15 || !moonUp) out.push(["good", "Galaxias y nebulosas", "noche oscura, sin Luna"]);
+  else {
+    const free = moonFreeWindow(n);
+    const ms = inN(n.moonset) ? ` hasta las ${fmtT(n.moonset)}` : inN(n.moonrise) ? ` desde las ${fmtT(n.moonrise)}` : "";
+    out.push([n.phase.illum > 0.5 ? "bad" : "warn", "Galaxias y nebulosas", `la Luna (${nf0.format(n.phase.illum * 100)} %) molesta${ms}` + (free.txt !== "Ninguna" ? ` · sin Luna de ${free.txt}` : "")]);
+  }
+  out.push([n.phase.illum > 0.8 && moonUp ? "warn" : "good", "Cúmulos y estrellas", n.phase.illum > 0.8 && moonUp ? "bien, aunque la Luna resta" : "bien"]);
+  return out;
+}
+function renderNightVerdict() {
+  const el = $("night-verdict"); if (!el) return;
+  el.innerHTML = `<strong>Esta noche</strong>` + nightSummary().map(([c, k, v]) => `<span class="chip ${c}"><span class="dot"></span>${esc(k)}: ${esc(v)}</span>`).join("");
+}
+
 /* ================== Inicio ================== */
 function renderHome() {
   const n = getNight(), p = place(), ph = n.phase;
@@ -14996,10 +15433,13 @@ function renderHome() {
     constelaciones: leg ? `Esta noche: ${consName(leg)}` : "",
     aprende: ALL_FACTS[factOfDay()].t,
     cielo: "Como Stellarium, en tu móvil",
+    efemerides: (() => { const w = ephWeek()[0]; return w ? `${dayLabel(w.t)}: ${ephTitle(w)}` : ""; })(),
     catalogo: `${nf0.format(OBJECTS.length)} objetos`,
     diario: `${Data.diary.length} ${Data.diary.length === 1 ? "observación" : "observaciones"}`,
     ajustes: activeScopeName()
   };
+  const wk = ephWeek().filter(e => e.t.getTime() < Date.now() + 7 * 86400000);
+  const hw = $("home-week"); hw.hidden = !wk.length; if (wk.length) hw.innerHTML = `<strong>Esta semana:</strong> ${wk.slice(0, 3).map(e => esc(`${ephTitle(e)} (${dayLabel(e.t)})`)).join(" · ")}`;
   for (const [k, v] of Object.entries(live)) { const el = $("hc-" + k); if (el) el.textContent = v || ""; }
 }
 function nightPlanets(n) {
@@ -15059,10 +15499,10 @@ function renderConst() {
   $("cn-say").onclick = () => Voice.say([info.n + ". " + info.t]);
   drawConst();
 }
-function drawConst() {
-  const cv = $("cn-canvas"); if (!cv || !CN_SEL) return;
-  const g = CONST_GEO[CN_SEL];
-  const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth || 520;
+function drawConst(cv = $("cn-canvas"), code = CN_SEL) {
+  if (!cv || !code) return;
+  const g = CONST_GEO[code];
+  const dpr = Math.min(2, window.devicePixelRatio || 1), W = Math.min(cv.clientWidth || 520, cv.clientHeight || 9999);
   cv.width = W * dpr; cv.height = W * dpr;
   const x = cv.getContext("2d"); x.scale(dpr, dpr);
   const R = Math.PI / 180;
@@ -15098,7 +15538,7 @@ function drawConst() {
   x.font = "600 13px Atkinson Hyperlegible, sans-serif"; x.fillStyle = txtC;
   const used = []; for (const s of g.s.filter(s => s[3]).sort((a, b) => a[2] - b[2])) { const q = toXY(s[0], s[1]); if (!q) continue; const w = x.measureText(s[3]).width, bx = [q[0] + 8, q[1] - 18, w, 16]; if (used.some(u => bx[0] < u[0] + u[2] && u[0] < bx[0] + w && bx[1] < u[1] + 16 && u[1] < bx[1] + 16)) continue; used.push(bx); x.fillText(s[3], q[0] + 8, q[1] - 6); }
   x.font = "22px Instrument Serif, Georgia, serif"; x.fillStyle = red ? "#ff5b4a" : "rgba(255,255,255,.85)";
-  x.fillText(CONST_INFO[CN_SEL].n, 14, W - 14);
+  x.fillText(CONST_INFO[code].n, 14, W - 14);
 }
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-cn]"); if (b) { CN_SEL = b.dataset.cn; renderConst(); if (innerWidth < 860) $("cn-detail").scrollIntoView({ behavior: "smooth" }); return; }
@@ -15405,12 +15845,223 @@ function arPointer() {
   cv.addEventListener("wheel", e => { e.preventDefault(); AR.fov = Math.max(10, Math.min(100, AR.fov * (e.deltaY > 0 ? 1.1 : 0.9))); }, { passive: false });
 }
 
+/* ================== Efemérides (apartado) ================== */
+const EPH_F = { todo: "Todo", destacado: "Destacadas", luna: "Luna", lluvia: "Lluvias de estrellas", eclipse: "Eclipses", planetas: "Planetas", conj: "Conjunciones", estacion: "Estaciones" };
+let EPH_SEL = "destacado", EPH_CACHE = { key: "", list: [] };
+const ephIcon = { luna: "●", "eclipse-sol": "◐", "eclipse-luna": "◑", lluvia: "✦", conj: "⁂", oposicion: "◎", elong: "☿", estacion: "☀" };
+function ephDay0() { const v = $("eph-from").value; const d = v ? new Date(v + "T12:00:00") : new Date(); d.setHours(0, 0, 0, 0); return d; }
+function ephList(from, days) {
+  const p = place(), key = [placeKey(p), from.toDateString(), days].join("|");
+  if (EPH_CACHE.key !== key) EPH_CACHE = { key, list: EPH.compute(from, days, p) };
+  return EPH_CACHE.list;
+}
+function ephImportant(e) {
+  return e.kind.startsWith("eclipse") || e.super || (e.kind === "lluvia" && e.sh.zhr >= 50) ||
+    (e.kind === "conj" && (e.planets ? e.sep < 1.5 : e.sep < 1.2)) || (e.kind === "oposicion" && ["mars", "jupiter", "saturn"].includes(e.b)) ||
+    e.kind === "estacion" || (e.kind === "elong" && e.b === "venus");
+}
+function ephMatch(e, f) {
+  if (f === "todo") return true;
+  if (f === "destacado") return ephImportant(e);
+  if (f === "eclipse") return e.kind.startsWith("eclipse");
+  if (f === "planetas") return e.kind === "oposicion" || e.kind === "elong" || (e.kind === "conj" && e.planets);
+  if (f === "luna") return e.kind === "luna";
+  return e.kind === f;
+}
+const pct = x => `${nf0.format(Math.max(0, Math.min(1, x)) * 100)} %`;
+const dayLabel = d => d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
+function ephText(e) {
+  const p = place();
+  const dirOf = (k, d) => { const o = BY_KEY[k]; if (!o) return ""; const h = horiz(o, d, p); return `${dirName(h.az)}, a ${nf0.format(h.alt)}° de altura`; };
+  switch (e.kind) {
+    case "luna": return e.super ? `A las ${fmtT(e.t)}. Es la Luna llena más cercana: a ${nf0.format(e.dist)} km, se ve algo más grande y brillante de lo normal.` : `A las ${fmtT(e.t)}.` + (e.phase === 0 ? " Semana buena para galaxias y nebulosas." : e.phase === 180 ? " Mala noche para cielo profundo; buena para enseñar la Luna, mejor con un filtro lunar." : " Buen momento para ver cráteres junto a la línea de sombra.");
+    case "eclipse-sol": {
+      const tipo = e.type === "total" ? "total" : e.type === "anular" ? "anular" : "parcial";
+      return `Eclipse ${tipo} de Sol visible desde ${placeLabel()}: empieza a las ${fmtT(e.c1)}, el máximo es a las ${fmtT(e.t)} (la Luna tapa el ${pct(e.mag)} del diámetro del Sol) y termina a las ${fmtT(e.c4)}. El Sol estará a ${nf0.format(e.altMax)}° de altura. Nunca lo mires sin gafas de eclipse homologadas ni con prismáticos o telescopio sin filtro solar.`;
+    }
+    case "eclipse-luna": {
+      const tipo = e.type === "total" ? "total" : e.type === "parcial" ? "parcial" : "penumbral";
+      let s = `Eclipse ${tipo} de Luna. Máximo a las ${fmtT(e.t)}` + (e.type !== "penumbral" ? `, con la sombra de la Tierra cubriendo el ${pct(Math.min(1, e.umag))} de la Luna` : ", apenas un oscurecimiento suave") + ".";
+      if (e.u1) s += ` La sombra entra a las ${fmtT(e.u1)} y sale a las ${fmtT(e.u4)}.`;
+      s += e.visMax ? ` La Luna estará a ${nf0.format(e.moonAltMax)}° de altura.` : " En el máximo la Luna está bajo el horizonte: se ve solo una parte, al salir o al ponerse.";
+      return s;
+    }
+    case "lluvia": {
+      const r = e.radBest;
+      let s = `Máximo hacia el ${dayLabel(e.t)} a las ${fmtT(e.t)}. Las mejores horas son cuando el radiante está más alto${r && r.alt > 0 ? ` (a las ${fmtT(r.t)}, a ${nf0.format(r.alt)}°)` : ""}.`;
+      s += e.rate > 0 ? ` En un cielo oscuro, unas ${e.rate} por hora.` : " Desde aquí el radiante apenas sube: se verán muy pocas.";
+      s += e.moonBad ? ` La Luna (${pct(e.illum)}) molesta buena parte de la noche.` : e.illum > 0.3 && e.moonFrac > 0.3 ? " La Luna molesta algo." : " Sin Luna que moleste.";
+      s += ` Las produce ${e.sh.par}.` + (e.sh.note ? ` ${e.sh.note}.` : "");
+      return s;
+    }
+    case "conj": {
+      const d = e.vis.best.t, k = e.b === "luna" ? e.a : e.b;
+      return `Mejor a las ${fmtT(d)} del ${dayLabel(d)}: mira hacia el ${dirOf(e.b === "luna" ? "luna" : e.b, d) || dirOf("luna", d)}. Separación mínima: ${nf1.format(e.sep)}° (${e.sep < 1 ? "menos que un dedo con el brazo estirado" : e.sep < 2.5 ? "un dedo o dos con el brazo estirado" : "unos dedos con el brazo estirado"}).` + (e.planets ? " Con prismáticos, los dos en el mismo campo." : "");
+    }
+    case "oposicion": return `El mejor momento del año para verlo: está en el lado opuesto al Sol, sale al anochecer y se ve toda la noche. Brillo ${nf1.format(e.mag)}${e.size ? `, tamaño ${nf1.format(e.size)}″` : ""}, a ${nf0.format(e.distAU * 149.6)} millones de km.`;
+    case "elong": return `${EPH.PN[e.b]} se separa ${nf0.format(e.elong)}° del Sol: ${e.east ? "búscalo al anochecer, bajo hacia el oeste" : "búscalo antes del amanecer, bajo hacia el este"}. Brillo ${nf1.format(e.mag)}.`;
+    case "estacion": return {
+      0: "Empieza la primavera: el día y la noche duran casi lo mismo y el Sol sale casi por el este exacto.",
+      90: "Empieza el verano: el día más largo y la noche más corta del año.",
+      180: "Empieza el otoño: el día y la noche vuelven a igualarse y las noches se alargan.",
+      270: "Empieza el invierno: la noche más larga del año, la mejor para observar."
+    }[e.lon] + ` A las ${fmtT(e.t)}.`;
+  }
+  return "";
+}
+function ephTitle(e) {
+  if (e.kind === "eclipse-sol") return `Eclipse ${e.type} de Sol`;
+  if (e.kind === "eclipse-luna") return `Eclipse ${e.type} de Luna`;
+  if (e.kind === "lluvia") return `Lluvia de estrellas: ${e.title}`;
+  return e.title;
+}
+function ephTarget(e) { if (e.kind === "conj") return e.b === "luna" ? "Luna" : (BY_KEY[e.b] ? shortLabel(BY_KEY[e.b]) : ""); if (e.kind === "oposicion" || e.kind === "elong") return EPH.PN[e.b]; if (e.kind.startsWith("eclipse-luna") || e.kind === "luna") return "Luna"; return ""; }
+function renderEph() {
+  if (!$("eph-from").value) { const d = new Date(); $("eph-from").value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+  const all = ephList(ephDay0(), +$("eph-days").value), list = all.filter(e => ephMatch(e, EPH_SEL));
+  $("eph-f").innerHTML = Object.entries(EPH_F).map(([k, v]) => `<button type="button" data-ephf="${k}" aria-pressed="${k === EPH_SEL}">${v}</button>`).join("");
+  $("eph-count").textContent = `${list.length} de ${all.length} · ${placeLabel()}`;
+  let month = "";
+  $("eph-list").innerHTML = list.length ? list.map((e, i) => {
+    const m = e.t.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+    const head = m !== month ? `<h3 class="eph-month">${(month = m).charAt(0).toUpperCase() + m.slice(1)}</h3>` : "";
+    const tgt = ephTarget(e);
+    return head + `<div class="eph-item${ephImportant(e) ? " hot" : ""}" id="eph-${i}">
+      <div class="eph-date"><span class="d">${e.t.getDate()}</span><span class="w">${e.t.toLocaleDateString("es-ES", { weekday: "short" })}</span></div>
+      <div class="eph-body"><h4><span class="eph-ic">${ephIcon[e.kind] || "•"}</span> ${esc(ephTitle(e))}</h4><p>${esc(ephText(e))}</p>
+      <div class="row"><button class="btn" type="button" data-ephsay="${i}">Escuchar</button>${tgt ? `<button class="btn ghost" type="button" data-ephsky="${esc(tgt)}">Ver en el cielo</button>` : ""}</div></div></div>`;
+  }).join("") : `<p class="empty">No hay efemérides de este tipo en el periodo elegido.</p>`;
+  $("eph-list").dataset.n = "";
+  EPH_SHOWN = list;
+}
+let EPH_SHOWN = [];
+function ephWeek() {
+  const from = new Date(); from.setHours(0, 0, 0, 0);
+  return ephList(from, 90).filter(e => ephImportant(e) && e.t.getTime() >= Date.now() - 12 * 3600000);
+}
+
+/* ================== Modo presentador ================== */
+const PRES = { i: 0, on: false, auto: false, t0: 0, tick: 0 };
+function presShow(i) {
+  if (!CHARLA.length) return;
+  PRES.i = Math.max(0, Math.min(CHARLA.length - 1, i));
+  const s = CHARLA[PRES.i];
+  $("pres-block").textContent = CH_BLOCKS[s.block][0];
+  $("pres-time").textContent = fmtT(s.t);
+  $("pres-title").textContent = s.title;
+  $("pres-look").textContent = s.look;
+  $("pres-body").textContent = s.text;
+  $("pres-count").textContent = `${PRES.i + 1} / ${CHARLA.length}`;
+  const vis = $("pres-vis");
+  if (s.cn) { vis.innerHTML = `<canvas id="pres-canvas"></canvas>`; requestAnimationFrame(() => drawConst($("pres-canvas"), s.cn)); }
+  else vis.innerHTML = presCompass(s.h);
+  if (PRES.auto) Voice.say([s.title + ". " + s.look + " " + s.text]);
+}
+function presCompass(h) {
+  // rosa de los vientos con el punto donde mirar (la distancia al centro indica la altura)
+  const r = 120 * (1 - Math.max(0, h.alt) / 90), a = h.az * Math.PI / 180;
+  const x = 150 + r * Math.sin(a), y = 150 - r * Math.cos(a);
+  const lab = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"].map((t, i) => { const b = i * Math.PI / 4; return `<text x="${150 + 138 * Math.sin(b)}" y="${155 - 138 * Math.cos(b)}" text-anchor="middle" class="pc-l${i % 2 ? " s" : ""}">${t}</text>`; }).join("");
+  return `<svg viewBox="0 0 300 300" class="pres-compass" role="img" aria-label="Dónde mirar: ${esc(dirName(h.az))}, ${nf0.format(h.alt)} grados de altura">
+    <circle cx="150" cy="150" r="120" class="pc-h"/><circle cx="150" cy="150" r="80" class="pc-g"/><circle cx="150" cy="150" r="40" class="pc-g"/>
+    <line x1="150" y1="30" x2="150" y2="270" class="pc-g"/><line x1="30" y1="150" x2="270" y2="150" class="pc-g"/>${lab}
+    <circle cx="${x}" cy="${y}" r="13" class="pc-dot"/><circle cx="${x}" cy="${y}" r="24" class="pc-ring"/></svg>
+    <p class="pc-cap">Horizonte en el borde · cenit en el centro</p>`;
+}
+function presOpen() {
+  if (!CHARLA.length) buildCharla();
+  if (!CHARLA.length) { toast("Prepara primero la charla"); return; }
+  $("pres").hidden = false; PRES.on = true; PRES.t0 = Date.now();
+  document.body.style.overflow = "hidden";
+  try { $("pres").requestFullscreen && $("pres").requestFullscreen().catch(() => {}); } catch { /* nada */ }
+  presShow(0);
+  const clock = () => { const m = Math.floor((Date.now() - PRES.t0) / 60000); $("pres-clock").textContent = `${fmtT(new Date())} · ${m} min`; };
+  clock(); clearInterval(PRES.tick); PRES.tick = setInterval(clock, 15000);
+}
+function presClose() {
+  $("pres").hidden = true; PRES.on = false; clearInterval(PRES.tick); document.body.style.overflow = "";
+  Voice.stop && Voice.stop();
+  try { if (document.fullscreenElement) document.exitFullscreen(); } catch { /* nada */ }
+}
+document.addEventListener("keydown", e => {
+  if (!PRES.on) return;
+  if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); presShow(PRES.i + 1); }
+  else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); presShow(PRES.i - 1); }
+  else if (e.key === "Escape") presClose();
+  else if (e.key.toLowerCase() === "l") $("pres-say").click();
+});
+
+/* ================== Ajuste manual del norte (Apunta al cielo) ================== */
+AR.azOff = store.get("arAzOff", 0);
+AR.rotAz = function (v) {
+  const d = this.azOff * Astro.RAD, c = Math.cos(d), s = Math.sin(d);
+  return [v[0] * c + v[1] * s, v[1] * c - v[0] * s, v[2]];
+};
+const arBasis0 = AR.basis.bind(AR);
+AR.basis = function () {
+  const B = arBasis0();
+  if (!this.sensor || !this.azOff) return B;
+  return { right: this.rotAz(B.right), up: this.rotAz(B.up), back: this.rotAz(B.back) };
+};
+function arCalibOpen() {
+  const now = new Date(), p = place();
+  const cands = OBJECTS.filter(o => o.kind === "planet" || o.kind === "moon" || (o.kind === "star" && o.mag < 1.6))
+    .map(o => ({ o, h: horiz(o, now, p), m: o.kind === "planet" ? Astro.planet(o.pkey, now).mag : o.kind === "moon" ? -12 : o.mag }))
+    .filter(x => x.h.alt > 8 && x.m < 2).sort((a, b) => a.m - b.m).slice(0, 7);
+  $("ar-cal").innerHTML = `<p><strong>Ajustar el norte.</strong> Pon en el centro del círculo una de estas y tócala en la lista:</p>
+    <div class="row">${cands.map(x => `<button class="btn" type="button" data-arcal="${x.o.key}">${esc(x.o.name)} · ${dir8(x.h.az)}</button>`).join("")}</div>
+    <div class="row"><button class="btn ghost" type="button" data-arcal="__reset">Quitar ajuste${AR.azOff ? ` (${nf0.format(AR.azOff)}°)` : ""}</button><button class="btn ghost" type="button" data-arcal="__close">Cerrar</button></div>`;
+  $("ar-cal").hidden = false;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-arcal]"); if (!b) return;
+  const k = b.dataset.arcal;
+  if (k === "__close") { $("ar-cal").hidden = true; return; }
+  if (k === "__reset") { AR.azOff = 0; store.set("arAzOff", 0); $("ar-cal").hidden = true; toast("Ajuste del norte quitado"); return; }
+  if (!AR.sensor) { toast("Hace falta que se muevan los sensores para ajustar"); return; }
+  const o = BY_KEY[k], h = horiz(o, new Date(), place());
+  const B = arBasis0(), fw = B.back.map(v => -v);
+  const devAz = (Math.atan2(fw[0], fw[1]) / Astro.RAD + 360) % 360;
+  let off = ((h.az - devAz + 540) % 360) - 180;
+  AR.azOff = off; store.set("arAzOff", off);
+  $("ar-cal").hidden = true;
+  toast(`Norte ajustado ${off >= 0 ? "+" : ""}${nf0.format(off)}° con ${o.name}`);
+});
+
+/* ================== Navegación en el móvil ================== */
+function renderMoreSheet() {
+  $("more-sheet").innerHTML = [...document.querySelectorAll("nav.tabs a:not([data-main])")].map(a => `<a href="${a.getAttribute("href")}" data-view="${a.dataset.view}">${a.innerHTML}</a>`).join("");
+}
+function syncCtlSum() {
+  const d = S.time;
+  $("ctl-sum").innerHTML = `<span>${esc(d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" }))} · ${fmtT(d)} · ${esc(placeLabel())}</span><span aria-hidden="true">▾</span>`;
+}
+
+/* ================== Preparar salida sin cobertura ================== */
+function renderTripNote() {
+  const row = $("trip-row"); if (!row || !(ANDROID || WEB)) return;
+  row.hidden = false;
+  const m = Meteo.docs[0];
+  const off = !navigator.onLine;
+  $("trip-note").textContent = m ? `${off ? "Sin conexión · " : ""}Previsión guardada de ${m.place || placeLabel()}, descargada ${new Date(m.fetchedAt).toLocaleString("es-ES", { weekday: "short", hour: "2-digit", minute: "2-digit" })}` : off ? "Sin conexión y sin previsión guardada para este lugar" : "";
+}
+async function prepareTrip() {
+  if (!navigator.onLine) { toast("Necesitas conexión para preparar la salida"); return; }
+  toast("Descargando la previsión de " + placeLabel() + "…");
+  await refreshWeather(true);
+  try { if ("caches" in window) { const c = await caches.open("astrorus-v1"); await c.add(location.pathname.endsWith("/") ? "./" : location.pathname); } } catch { /* sin caché */ }
+  const n = getNight();
+  renderTripNote();
+  toast(Meteo.docs.length ? `Listo: previsión de ${placeLabel()} guardada. La app funciona sin cobertura (noche del ${n.date.getDate()}).` : "No se pudo descargar la previsión");
+}
+
 /* ================== navegación y render ================== */
 function setView(v) {
-  if (!["inicio", "noche", "dwarf", "charla", "constelaciones", "aprende", "catalogo", "diario", "ajustes", "cielo"].includes(v)) v = "inicio";
+  if (!["inicio", "noche", "dwarf", "charla", "constelaciones", "aprende", "catalogo", "diario", "ajustes", "cielo", "efemerides"].includes(v)) v = "inicio";
   window.scrollTo(0, 0);
   S.view = v;
   document.querySelectorAll("section.view").forEach(s => s.classList.toggle("on", s.id === "v-" + v));
+  $("more-sheet").hidden = true; $("nav-more").setAttribute("aria-expanded", "false"); $("nav-more").classList.toggle("on", !document.querySelector(`nav.tabs a[data-main][data-view="${v}"]`));
   document.querySelectorAll("nav.tabs a").forEach(a => { if (a.dataset.view === v) { a.setAttribute("aria-current", "page"); const nav = a.parentElement; nav.scrollLeft = a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2; } else a.removeAttribute("aria-current"); });
   render();
 }
@@ -15423,6 +16074,8 @@ function render() {
   if (S.view === "charla") buildCharla();
   if (S.view === "constelaciones") renderConstList();
   if (S.view === "aprende") renderFacts();
+  if (S.view === "efemerides") renderEph();
+  syncCtlSum();
   if (S.view === "catalogo") renderCatalog();
   if (S.view === "diario") renderDiary();
   if (S.view === "ajustes") { renderPlaces(); renderEquip(); }
@@ -15479,6 +16132,24 @@ $("ar-sens").addEventListener("click", () => { if (AR.aos) { try { AR.aos.stop()
 $("ar-cam").addEventListener("click", () => AR.camera(!AR.stream));
 $("ar-red").addEventListener("click", () => { S.red = !S.red; store.set("red", S.red); applyRed(); $("ar-red").setAttribute("aria-pressed", S.red ? "true" : "false"); });
 $("ar-target").addEventListener("change", () => AR.setTarget($("ar-target").value));
+["eph-days", "eph-from"].forEach(id => $(id).addEventListener("change", renderEph));
+document.addEventListener("click", e => {
+  const f = e.target.closest("[data-ephf]"); if (f) { EPH_SEL = f.dataset.ephf; renderEph(); return; }
+  const sy = e.target.closest("[data-ephsay]"); if (sy) { const ev = EPH_SHOWN[+sy.dataset.ephsay]; Voice.say([ephTitle(ev) + ". " + ephText(ev)]); return; }
+  const sk = e.target.closest("[data-ephsky]"); if (sk) { AR.setTarget(sk.dataset.ephsky); $("ar-target").value = sk.dataset.ephsky; AR.start(); return; }
+  const ms = e.target.closest("#more-sheet a"); if (ms) { $("more-sheet").hidden = true; }
+});
+$("ch-present").addEventListener("click", presOpen);
+$("pres-close").addEventListener("click", presClose);
+$("pres-next").addEventListener("click", () => presShow(PRES.i + 1));
+$("pres-prev").addEventListener("click", () => presShow(PRES.i - 1));
+$("pres-say").addEventListener("click", () => { PRES.auto = !PRES.auto; $("pres-say").setAttribute("aria-pressed", PRES.auto ? "true" : "false"); if (PRES.auto) presShow(PRES.i); else Voice.stop && Voice.stop(); });
+$("pres").addEventListener("click", e => { if (e.target.closest("button")) return; const r = $("pres").getBoundingClientRect(); presShow(PRES.i + (e.clientX > r.width / 3 ? 1 : -1)); });
+$("ar-calib").addEventListener("click", arCalibOpen);
+$("nav-more").addEventListener("click", () => { const sh = $("more-sheet"); renderMoreSheet(); sh.hidden = !sh.hidden; $("nav-more").setAttribute("aria-expanded", sh.hidden ? "false" : "true"); });
+$("ctl-sum").addEventListener("click", () => { const c = document.querySelector(".controls"); c.classList.toggle("open"); $("ctl-sum").setAttribute("aria-expanded", c.classList.contains("open") ? "true" : "false"); });
+$("btn-trip").addEventListener("click", prepareTrip);
+window.addEventListener("online", renderTripNote); window.addEventListener("offline", renderTripNote);
 $("fact-say").addEventListener("click", () => { const f = ALL_FACTS[FACT_I]; Voice.say(["¿Sabías que…? " + f.t + ". " + f.d]); });
 $("fact-next").addEventListener("click", () => { let i; do { i = Math.floor(Math.random() * ALL_FACTS.length); } while (i === FACT_I); FACT_I = i; renderFacts(); });
 $("fact-today").addEventListener("click", () => { FACT_I = factOfDay(); renderFacts(); });
