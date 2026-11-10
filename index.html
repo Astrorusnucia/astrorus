@@ -366,6 +366,37 @@ nav.tabs a[aria-current="page"] { color: var(--accent-ink); background: var(--ac
 nav.tabs .sh { display: none; }
 @media (max-width: 700px) { nav.tabs .sh { display: inline; } nav.tabs .lg { display: none; } }
 
+/* ===== v2.1: 5 pestañas, sub-secciones, ⚙︎ y botón rojo fijo ===== */
+.gear { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px; border: 1px solid rgba(255,255,255,.12); }
+.gear .ic { width: 20px; height: 20px; }
+.gear[aria-current="page"] { color: var(--accent); border-color: var(--accent); }
+.subnav { display: flex; gap: 6px; margin: 0 0 14px; padding: 4px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); overflow-x: auto; }
+.subnav a { flex: 1; text-align: center; white-space: nowrap; padding: 9px 14px; border-radius: 10px; color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px; }
+.subnav a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); }
+.fab-red { position: fixed; left: 14px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 70; width: 52px; height: 52px; border-radius: 50%; border: 2px solid #ff3b2b; background: rgba(40,4,4,.88); color: #ff3b2b; display: grid; place-items: center; cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.55); padding: 0; }
+.fab-red svg { width: 28px; height: 28px; }
+.fab-red[aria-pressed="true"] { background: #ff3b2b; color: #1a0000; }
+@media (max-width: 700px) { .fab-red { bottom: calc(80px + env(safe-area-inset-bottom)); width: 48px; height: 48px; } .gear span { display: none; } .gear { padding: 8px; } }
+.obs-card { padding-top: 12px; padding-bottom: 12px; }
+.obs-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.obs-lbl { font-weight: 700; }
+.seg { display: flex; flex-wrap: wrap; gap: 4px; padding: 3px; border-radius: 12px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); }
+.seg button { font: inherit; font-size: 14px; font-weight: 700; padding: 8px 12px; border-radius: 9px; border: 0; background: none; color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+#obs-note { margin: 8px 0 0; }
+/* charla: Guíame, QR y modo público */
+.btn.guide { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.qr-dlg { border: 0; padding: 0; background: transparent; max-width: min(94vw, 460px); }
+.qr-dlg::backdrop { background: rgba(0,0,0,.8); }
+.qr-box { background: #0c1022; color: var(--ink); border: 1px solid rgba(255,255,255,.15); border-radius: 18px; padding: 18px; display: grid; gap: 10px; text-align: center; }
+:root.rojo .qr-box { background: #160303; }
+.qr-box h2 { margin: 0; }
+#qr-canvas { width: min(80vw, 360px); height: auto; aspect-ratio: 1; margin: 0 auto; border-radius: 10px; }
+.qr-cap { font-weight: 700; margin: 0; }
+.pub-banner { border-color: var(--accent); }
+.pub-banner h2 { margin: 0 0 6px; }
+:root.publico #ch-present, :root.publico #ch-qr, :root.publico #ch-copy, :root.publico #ch-rep, :root.publico #ch-rep-note, :root.publico label:has(> #ch-rep), :root.publico label:has(> #ch-src) { display: none; }
+
 </style>
 </head>
 <body>
@@ -375,6 +406,7 @@ nav.tabs .sh { display: none; }
       <h1><a href="#inicio" class="home-link">Astrorus</a></h1>
       <span class="sub" id="brand-sub">Tu noche de observación</span>
     </div>
+    <a href="#ajustes" class="gear" id="nav-gear" data-view="ajustes" aria-label="Mi equipo, diario y ajustes" title="Mi equipo, diario y ajustes"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Más</span></a>
     <button type="button" class="ctl-sum" id="ctl-sum" aria-expanded="false"></button>
     <div class="controls">
       <label class="field">Fecha
@@ -385,24 +417,15 @@ nav.tabs .sh { display: none; }
         <select id="in-place"></select></label>
       <button class="btn ghost loc-btn" id="btn-loc" type="button" hidden aria-pressed="false" aria-label="Usar mi ubicación"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg></button>
       <button class="btn ghost" id="btn-now" type="button">Ahora</button>
-      <button class="btn ghost" id="btn-red" type="button" aria-pressed="false" title="Pone toda la pantalla en rojo para no perder la vista nocturna">Modo rojo</button>
     </div>
   </div>
   <nav class="tabs" aria-label="Secciones">
     <a href="#inicio" data-view="inicio" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></a>
-    <a href="#cielo" data-view="cielo" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="7" y="9" width="10" height="13" rx="2"/><path d="M12 2l1.2 2.6L16 5l-2.1 1.8.6 2.7L12 8.2 9.5 9.5l.6-2.7L8 5l2.8-.4z"/></svg><span class="lg">Apunta al cielo</span><span class="sh">Cielo</span></a>
     <a href="#noche" data-view="noche" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span>Esta noche</span></a>
-    <a href="#dwarf" data-view="dwarf"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 15l11-6 2 4-11 6zM15 9l3-1.5 2 4-3 1.5M9 18l-2 4M11 17l2 5"/></svg><span>Dwarf 3</span></a>
+    <a href="#cielo" data-view="cielo" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="7" y="9" width="10" height="13" rx="2"/><path d="M12 2l1.2 2.6L16 5l-2.1 1.8.6 2.7L12 8.2 9.5 9.5l.6-2.7L8 5l2.8-.4z"/></svg><span>Cielo</span></a>
+    <a href="#efemerides" data-view="efemerides" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/></svg><span>Calendario</span></a>
     <a href="#charla" data-view="charla" data-main><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span>Charla</span></a>
-    <a href="#constelaciones" data-view="constelaciones"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M4 18l5-6 5 3 6-9"/><circle cx="4" cy="18" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="14" cy="15" r="1.6"/><circle cx="20" cy="6" r="1.6"/></svg><span>Constelaciones</span></a>
-    <a href="#efemerides" data-view="efemerides"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/></svg><span>Efemérides</span></a>
-    <a href="#aprende" data-view="aprende"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg><span>Aprende</span></a>
-    <a href="#catalogo" data-view="catalogo"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M5 4h11l3 3v13H5z"/><path d="M9 10h6M9 14h6"/></svg><span>Catálogo</span></a>
-    <a href="#diario" data-view="diario"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><path d="M6 3h11v18H6z"/><path d="M9 7h5M9 11h5"/></svg><span>Diario</span></a>
-    <a href="#ajustes" data-view="ajustes"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg><span>Ajustes</span></a>
-    <button type="button" id="nav-more" class="nav-more" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Más</span></button>
   </nav>
-  <div class="more-sheet" id="more-sheet" hidden></div>
 </header>
 
 <main>
@@ -446,6 +469,13 @@ nav.tabs .sh { display: none; }
   <!-- ===================== ESTA NOCHE ===================== -->
   <section class="view" id="v-noche">
     <div class="tiles" id="night-tiles"></div>
+    <div class="card obs-card">
+      <div class="obs-row"><span class="obs-lbl">Observo con</span>
+        <div class="seg" id="obs-seg" role="group" aria-label="Con qué observas">
+          <button type="button" data-obs="ojo">A simple vista</button><button type="button" data-obs="prism">Prismáticos</button><button type="button" data-obs="tele">Telescopio</button><button type="button" data-obs="dwarf">Dwarf 3</button>
+        </div></div>
+      <p class="muted small" id="obs-note"></p>
+    </div>
     <div class="card">
       <header><h2>Nubes y seeing</h2></header>
       <div id="night-verdict" class="night-verdict"></div>
@@ -453,7 +483,7 @@ nav.tabs .sh { display: none; }
       <div class="row" id="trip-row" hidden><button class="btn" type="button" id="btn-trip">Preparar salida sin cobertura</button><span class="muted small" id="trip-note"></span></div>
     </div>
     <details class="card" id="flt-card">
-      <summary><h2 style="display:inline">Qué mostrar</h2> <span class="muted small">tipos, catálogos y brillo para el mapa, «Lo mejor» y el Dwarf</span></summary>
+      <summary><h2 style="display:inline">Qué mostrar</h2> <span class="muted small">tipos, catálogos y brillo para el mapa y la lista</span></summary>
       <div data-filters style="display:grid;gap:10px;margin-top:10px"></div>
     </details>
     <div class="grid2">
@@ -484,14 +514,9 @@ nav.tabs .sh { display: none; }
       <div class="tablewrap"><table id="best-table"></table></div>
       <div class="row"><button class="btn" type="button" id="list-more" hidden>Ver más</button></div>
     </div>
-  </section>
-
-  <!-- ===================== DWARF 3 ===================== -->
-  <section class="view" id="v-dwarf">
+    <div id="dwarf-block" hidden>
     <div class="card">
       <header><h2>Objetivos para el Dwarf 3</h2><span class="muted small" id="dwarf-fov"></span></header>
-      <div id="dwarf-meteo"></div>
-      <details><summary class="small">Qué mostrar (tipos, catálogos y brillo)</summary><div data-filters style="display:grid;gap:10px;margin-top:10px"></div></details>
       <p class="lead">Objetos que esta noche pasan al menos una hora por encima de 30° con el cielo oscuro. Para cada uno verás cómo encaja en el campo de la cámara tele, qué filtro usar y cuánto tiempo de exposición total conviene.</p>
       <div class="row">
         <label class="field">Tipo
@@ -513,13 +538,21 @@ nav.tabs .sh { display: none; }
       <header><h2>Mi plan de sesiones</h2><span class="muted small" id="plan-store"></span></header>
       <div class="list" id="plan-list"></div>
     </div>
+    </div>
   </section>
+
 
   <!-- ===================== CHARLA ===================== -->
   <section class="view" id="v-charla">
-    <div class="card">
+    <div class="card pub-banner" id="pub-banner" hidden>
+      <h2>Charla en directo</h2>
+      <p id="pub-text"></p>
+      <p class="muted small">Pulsa <strong>Guíame</strong> en cada paso y apunta con el móvil al cielo: una flecha te lleva al objeto. El botón rojo redondo protege la vista de todos.</p>
+      <div class="row"><button class="btn ghost" type="button" id="pub-exit">Usar Astrorus normal</button></div>
+    </div>
+    <div class="card" id="ch-card">
       <header><h2>Charla guiada</h2></header>
-      <p class="lead">Tres partes: <strong>lo imprescindible</strong>, que se enseña siempre para orientarse; <strong>lo de hoy</strong>, que cambia cada noche según lo que esté alto; y <strong>la leyenda de la noche</strong>, la historia de una constelación visible, distinta cada día. La app puede leerla en voz alta.</p>
+      <p class="lead">Se prepara sola para tu sitio y tu hora: <strong>lo especial de esta noche</strong> (si hay lluvia de estrellas, conjunción o eclipse), <strong>lo imprescindible</strong> para orientarse, <strong>lo de hoy</strong> según lo que esté alto, <strong>la leyenda de la noche</strong> y un <strong>¿sabías que…?</strong> para cerrar. Pulsa <strong>Guíame</strong> en cada paso y el móvil te lleva al objeto.</p>
       <div class="row">
         <label class="field">Empieza a las
           <input type="time" id="ch-start" step="300"></label>
@@ -534,9 +567,13 @@ nav.tabs .sh { display: none; }
           <select id="ch-lvl"><option value="general">General</option><option value="ninos">Niños</option></select></label>
         <label class="field">Objetos
           <select id="ch-src"><option value="auto">Los elige Astrorus</option><option value="lista">Mi lista de esta noche</option></select></label>
+        <label class="field">Grupo
+          <select id="ch-rep"><option value="no">Nuevo</option><option value="si">Repite: no contar lo de la última charla</option></select></label>
       </div>
+      <p class="muted small" id="ch-rep-note"></p>
       <div class="row">
         <button class="btn primary" id="ch-present" type="button">Presentar en pantalla grande</button>
+        <button class="btn primary" id="ch-qr" type="button">QR para el público</button>
         <button class="btn" id="ch-play" type="button">Leer toda la charla</button>
         <button class="btn" id="ch-copy" type="button">Copiar el guion</button>
       </div>
@@ -721,7 +758,6 @@ nav.tabs .sh { display: none; }
     <button class="btn" type="button" id="ar-sens" hidden>Activar sensores</button>
     <button class="btn" type="button" id="ar-calib">Ajustar norte</button>
     <button class="btn" type="button" id="ar-cam" aria-pressed="false">Cámara</button>
-    <button class="btn" type="button" id="ar-red" aria-pressed="false">Rojo</button>
   </div>
   <div class="ar-center" id="ar-center"></div>
   <div class="ar-cal" id="ar-cal" hidden></div>
@@ -742,13 +778,22 @@ nav.tabs .sh { display: none; }
     <button class="btn" type="button" id="pres-prev" aria-label="Anterior">◀</button>
     <span id="pres-count"></span>
     <button class="btn" type="button" id="pres-next" aria-label="Siguiente">▶</button>
+    <button class="btn" type="button" id="pres-qr">QR</button>
     <button class="btn" type="button" id="pres-say" aria-pressed="false">Leer en voz alta</button>
     <button class="btn" type="button" id="pres-close">✕ Salir</button>
   </div>
 </div>
+<dialog id="qr-dlg" class="qr-dlg" aria-labelledby="qr-title"><div class="qr-box">
+  <h2 id="qr-title">Sigue la charla en tu móvil</h2>
+  <canvas id="qr-canvas" width="400" height="400" aria-label="Código QR de la charla"></canvas>
+  <p class="qr-cap" id="qr-cap"></p>
+  <p class="muted small">Escanéalo con la cámara. No hace falta instalar nada ni crear cuenta; se abre ya en modo rojo.</p>
+  <div class="row" style="justify-content:center"><button class="btn" type="button" id="qr-dl">Descargar imagen</button><button class="btn" type="button" id="qr-copy">Copiar enlace</button><button class="btn primary" type="button" id="qr-close">Cerrar</button></div>
+</div></dialog>
 <dialog id="ficha" aria-labelledby="f-title"><div class="ficha" id="ficha-body"></div></dialog>
 <div class="player" id="player"><span id="player-txt" class="small">Leyendo…</span><button class="btn" id="player-stop" type="button">Parar</button></div>
 <div class="toast" id="toast" role="status"></div>
+<button type="button" id="btn-red" class="fab-red" aria-pressed="false" aria-label="Modo rojo" title="Modo rojo: protege la vista nocturna"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></button>
 
 <script>window.ASTRORUS_TARGET = "web";</script>
 <script>
@@ -14000,6 +14045,1281 @@ const EPH = (() => {
   return { compute, SHOWERS, PN };
 })();
 
+/* QR Code para JavaScript · Copyright (c) 2009 Kazuhiko Arase · Licencia MIT (http://www.opensource.org/licenses/mit-license.php)
+   «QR Code» es marca registrada de DENSO WAVE INCORPORATED. Empaquetado para Astrorus. */
+const QRLIB = (() => {
+  const M = {}, C = {};
+  const req = n => { n = n.replace('./', '').replace('.js', ''); if (!C[n]) { const m = { exports: {} }; C[n] = m; M[n](m, m.exports, req); } return C[n].exports; };
+  M['QR8bitByte'] = function (module, exports, require) {
+var QRMode = require('./QRMode');
+
+function QR8bitByte(data) {
+	this.mode = QRMode.MODE_8BIT_BYTE;
+	this.data = data;
+}
+
+QR8bitByte.prototype = {
+
+	getLength : function() {
+		return this.data.length;
+	},
+	
+	write : function(buffer) {
+		for (var i = 0; i < this.data.length; i++) {
+			// not JIS ...
+			buffer.put(this.data.charCodeAt(i), 8);
+		}
+	}
+};
+
+module.exports = QR8bitByte;
+
+  };
+  M['QRBitBuffer'] = function (module, exports, require) {
+function QRBitBuffer() {
+	this.buffer = [];
+	this.length = 0;
+}
+
+QRBitBuffer.prototype = {
+
+	get : function(index) {
+		var bufIndex = Math.floor(index / 8);
+		return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+	},
+	
+	put : function(num, length) {
+		for (var i = 0; i < length; i++) {
+			this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+		}
+	},
+	
+	getLengthInBits : function() {
+		return this.length;
+	},
+	
+	putBit : function(bit) {
+	
+		var bufIndex = Math.floor(this.length / 8);
+		if (this.buffer.length <= bufIndex) {
+			this.buffer.push(0);
+		}
+	
+		if (bit) {
+			this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
+		}
+	
+		this.length++;
+	}
+};
+
+module.exports = QRBitBuffer;
+
+  };
+  M['QRErrorCorrectLevel'] = function (module, exports, require) {
+module.exports = {
+	L : 1,
+	M : 0,
+	Q : 3,
+	H : 2
+};
+
+
+  };
+  M['QRMaskPattern'] = function (module, exports, require) {
+module.exports = {
+	PATTERN000 : 0,
+	PATTERN001 : 1,
+	PATTERN010 : 2,
+	PATTERN011 : 3,
+	PATTERN100 : 4,
+	PATTERN101 : 5,
+	PATTERN110 : 6,
+	PATTERN111 : 7
+};
+
+  };
+  M['QRMath'] = function (module, exports, require) {
+var QRMath = {
+
+	glog : function(n) {
+	
+		if (n < 1) {
+			throw new Error("glog(" + n + ")");
+		}
+		
+		return QRMath.LOG_TABLE[n];
+	},
+	
+	gexp : function(n) {
+	
+		while (n < 0) {
+			n += 255;
+		}
+	
+		while (n >= 256) {
+			n -= 255;
+		}
+	
+		return QRMath.EXP_TABLE[n];
+	},
+	
+	EXP_TABLE : new Array(256),
+	
+	LOG_TABLE : new Array(256)
+
+};
+	
+for (var i = 0; i < 8; i++) {
+	QRMath.EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i++) {
+	QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4]
+		^ QRMath.EXP_TABLE[i - 5]
+		^ QRMath.EXP_TABLE[i - 6]
+		^ QRMath.EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i++) {
+	QRMath.LOG_TABLE[QRMath.EXP_TABLE[i] ] = i;
+}
+
+module.exports = QRMath;
+
+  };
+  M['QRMode'] = function (module, exports, require) {
+module.exports = {
+    MODE_NUMBER :       1 << 0,
+    MODE_ALPHA_NUM :    1 << 1,
+    MODE_8BIT_BYTE :    1 << 2,
+    MODE_KANJI :        1 << 3
+};
+
+  };
+  M['QRPolynomial'] = function (module, exports, require) {
+var QRMath = require('./QRMath');
+
+function QRPolynomial(num, shift) {
+	if (num.length === undefined) {
+		throw new Error(num.length + "/" + shift);
+	}
+
+	var offset = 0;
+
+	while (offset < num.length && num[offset] === 0) {
+		offset++;
+	}
+
+	this.num = new Array(num.length - offset + shift);
+	for (var i = 0; i < num.length - offset; i++) {
+		this.num[i] = num[i + offset];
+	}
+}
+
+QRPolynomial.prototype = {
+
+	get : function(index) {
+		return this.num[index];
+	},
+	
+	getLength : function() {
+		return this.num.length;
+	},
+	
+	multiply : function(e) {
+	
+		var num = new Array(this.getLength() + e.getLength() - 1);
+	
+		for (var i = 0; i < this.getLength(); i++) {
+			for (var j = 0; j < e.getLength(); j++) {
+				num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
+			}
+		}
+	
+		return new QRPolynomial(num, 0);
+	},
+	
+	mod : function(e) {
+	
+		if (this.getLength() - e.getLength() < 0) {
+			return this;
+		}
+	
+		var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
+	
+		var num = new Array(this.getLength() );
+		
+		for (var i = 0; i < this.getLength(); i++) {
+			num[i] = this.get(i);
+		}
+		
+		for (var x = 0; x < e.getLength(); x++) {
+			num[x] ^= QRMath.gexp(QRMath.glog(e.get(x) ) + ratio);
+		}
+	
+		// recursive call
+		return new QRPolynomial(num, 0).mod(e);
+	}
+};
+
+module.exports = QRPolynomial;
+
+  };
+  M['QRRSBlock'] = function (module, exports, require) {
+var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+
+function QRRSBlock(totalCount, dataCount) {
+	this.totalCount = totalCount;
+	this.dataCount  = dataCount;
+}
+
+QRRSBlock.RS_BLOCK_TABLE = [
+
+	// L
+	// M
+	// Q
+	// H
+
+	// 1
+	[1, 26, 19],
+	[1, 26, 16],
+	[1, 26, 13],
+	[1, 26, 9],
+	
+	// 2
+	[1, 44, 34],
+	[1, 44, 28],
+	[1, 44, 22],
+	[1, 44, 16],
+
+	// 3
+	[1, 70, 55],
+	[1, 70, 44],
+	[2, 35, 17],
+	[2, 35, 13],
+
+	// 4		
+	[1, 100, 80],
+	[2, 50, 32],
+	[2, 50, 24],
+	[4, 25, 9],
+	
+	// 5
+	[1, 134, 108],
+	[2, 67, 43],
+	[2, 33, 15, 2, 34, 16],
+	[2, 33, 11, 2, 34, 12],
+	
+	// 6
+	[2, 86, 68],
+	[4, 43, 27],
+	[4, 43, 19],
+	[4, 43, 15],
+	
+	// 7		
+	[2, 98, 78],
+	[4, 49, 31],
+	[2, 32, 14, 4, 33, 15],
+	[4, 39, 13, 1, 40, 14],
+	
+	// 8
+	[2, 121, 97],
+	[2, 60, 38, 2, 61, 39],
+	[4, 40, 18, 2, 41, 19],
+	[4, 40, 14, 2, 41, 15],
+	
+	// 9
+	[2, 146, 116],
+	[3, 58, 36, 2, 59, 37],
+	[4, 36, 16, 4, 37, 17],
+	[4, 36, 12, 4, 37, 13],
+	
+	// 10		
+	[2, 86, 68, 2, 87, 69],
+	[4, 69, 43, 1, 70, 44],
+	[6, 43, 19, 2, 44, 20],
+	[6, 43, 15, 2, 44, 16],
+
+	// 11
+	[4, 101, 81],
+	[1, 80, 50, 4, 81, 51],
+	[4, 50, 22, 4, 51, 23],
+	[3, 36, 12, 8, 37, 13],
+
+	// 12
+	[2, 116, 92, 2, 117, 93],
+	[6, 58, 36, 2, 59, 37],
+	[4, 46, 20, 6, 47, 21],
+	[7, 42, 14, 4, 43, 15],
+
+	// 13
+	[4, 133, 107],
+	[8, 59, 37, 1, 60, 38],
+	[8, 44, 20, 4, 45, 21],
+	[12, 33, 11, 4, 34, 12],
+
+	// 14
+	[3, 145, 115, 1, 146, 116],
+	[4, 64, 40, 5, 65, 41],
+	[11, 36, 16, 5, 37, 17],
+	[11, 36, 12, 5, 37, 13],
+
+	// 15
+	[5, 109, 87, 1, 110, 88],
+	[5, 65, 41, 5, 66, 42],
+	[5, 54, 24, 7, 55, 25],
+	[11, 36, 12],
+
+	// 16
+	[5, 122, 98, 1, 123, 99],
+	[7, 73, 45, 3, 74, 46],
+	[15, 43, 19, 2, 44, 20],
+	[3, 45, 15, 13, 46, 16],
+
+	// 17
+	[1, 135, 107, 5, 136, 108],
+	[10, 74, 46, 1, 75, 47],
+	[1, 50, 22, 15, 51, 23],
+	[2, 42, 14, 17, 43, 15],
+
+	// 18
+	[5, 150, 120, 1, 151, 121],
+	[9, 69, 43, 4, 70, 44],
+	[17, 50, 22, 1, 51, 23],
+	[2, 42, 14, 19, 43, 15],
+
+	// 19
+	[3, 141, 113, 4, 142, 114],
+	[3, 70, 44, 11, 71, 45],
+	[17, 47, 21, 4, 48, 22],
+	[9, 39, 13, 16, 40, 14],
+
+	// 20
+	[3, 135, 107, 5, 136, 108],
+	[3, 67, 41, 13, 68, 42],
+	[15, 54, 24, 5, 55, 25],
+	[15, 43, 15, 10, 44, 16],
+
+	// 21
+	[4, 144, 116, 4, 145, 117],
+	[17, 68, 42],
+	[17, 50, 22, 6, 51, 23],
+	[19, 46, 16, 6, 47, 17],
+
+	// 22
+	[2, 139, 111, 7, 140, 112],
+	[17, 74, 46],
+	[7, 54, 24, 16, 55, 25],
+	[34, 37, 13],
+
+	// 23
+	[4, 151, 121, 5, 152, 122],
+	[4, 75, 47, 14, 76, 48],
+	[11, 54, 24, 14, 55, 25],
+	[16, 45, 15, 14, 46, 16],
+
+	// 24
+	[6, 147, 117, 4, 148, 118],
+	[6, 73, 45, 14, 74, 46],
+	[11, 54, 24, 16, 55, 25],
+	[30, 46, 16, 2, 47, 17],
+
+	// 25
+	[8, 132, 106, 4, 133, 107],
+	[8, 75, 47, 13, 76, 48],
+	[7, 54, 24, 22, 55, 25],
+	[22, 45, 15, 13, 46, 16],
+
+	// 26
+	[10, 142, 114, 2, 143, 115],
+	[19, 74, 46, 4, 75, 47],
+	[28, 50, 22, 6, 51, 23],
+	[33, 46, 16, 4, 47, 17],
+
+	// 27
+	[8, 152, 122, 4, 153, 123],
+	[22, 73, 45, 3, 74, 46],
+	[8, 53, 23, 26, 54, 24],
+	[12, 45, 15, 28, 46, 16],
+
+	// 28
+	[3, 147, 117, 10, 148, 118],
+	[3, 73, 45, 23, 74, 46],
+	[4, 54, 24, 31, 55, 25],
+	[11, 45, 15, 31, 46, 16],
+
+	// 29
+	[7, 146, 116, 7, 147, 117],
+	[21, 73, 45, 7, 74, 46],
+	[1, 53, 23, 37, 54, 24],
+	[19, 45, 15, 26, 46, 16],
+
+	// 30
+	[5, 145, 115, 10, 146, 116],
+	[19, 75, 47, 10, 76, 48],
+	[15, 54, 24, 25, 55, 25],
+	[23, 45, 15, 25, 46, 16],
+
+	// 31
+	[13, 145, 115, 3, 146, 116],
+	[2, 74, 46, 29, 75, 47],
+	[42, 54, 24, 1, 55, 25],
+	[23, 45, 15, 28, 46, 16],
+
+	// 32
+	[17, 145, 115],
+	[10, 74, 46, 23, 75, 47],
+	[10, 54, 24, 35, 55, 25],
+	[19, 45, 15, 35, 46, 16],
+
+	// 33
+	[17, 145, 115, 1, 146, 116],
+	[14, 74, 46, 21, 75, 47],
+	[29, 54, 24, 19, 55, 25],
+	[11, 45, 15, 46, 46, 16],
+
+	// 34
+	[13, 145, 115, 6, 146, 116],
+	[14, 74, 46, 23, 75, 47],
+	[44, 54, 24, 7, 55, 25],
+	[59, 46, 16, 1, 47, 17],
+
+	// 35
+	[12, 151, 121, 7, 152, 122],
+	[12, 75, 47, 26, 76, 48],
+	[39, 54, 24, 14, 55, 25],
+	[22, 45, 15, 41, 46, 16],
+
+	// 36
+	[6, 151, 121, 14, 152, 122],
+	[6, 75, 47, 34, 76, 48],
+	[46, 54, 24, 10, 55, 25],
+	[2, 45, 15, 64, 46, 16],
+
+	// 37
+	[17, 152, 122, 4, 153, 123],
+	[29, 74, 46, 14, 75, 47],
+	[49, 54, 24, 10, 55, 25],
+	[24, 45, 15, 46, 46, 16],
+
+	// 38
+	[4, 152, 122, 18, 153, 123],
+	[13, 74, 46, 32, 75, 47],
+	[48, 54, 24, 14, 55, 25],
+	[42, 45, 15, 32, 46, 16],
+
+	// 39
+	[20, 147, 117, 4, 148, 118],
+	[40, 75, 47, 7, 76, 48],
+	[43, 54, 24, 22, 55, 25],
+	[10, 45, 15, 67, 46, 16],
+
+	// 40
+	[19, 148, 118, 6, 149, 119],
+	[18, 75, 47, 31, 76, 48],
+	[34, 54, 24, 34, 55, 25],
+	[20, 45, 15, 61, 46, 16]
+];
+
+QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+	
+	var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+	
+	if (rsBlock === undefined) {
+		throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+	}
+
+	var length = rsBlock.length / 3;
+	
+	var list = [];
+	
+	for (var i = 0; i < length; i++) {
+
+		var count = rsBlock[i * 3 + 0];
+		var totalCount = rsBlock[i * 3 + 1];
+		var dataCount  = rsBlock[i * 3 + 2];
+
+		for (var j = 0; j < count; j++) {
+			list.push(new QRRSBlock(totalCount, dataCount) );	
+		}
+	}
+	
+	return list;
+};
+
+QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+
+	switch(errorCorrectLevel) {
+	case QRErrorCorrectLevel.L :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+	case QRErrorCorrectLevel.M :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+	case QRErrorCorrectLevel.Q :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+	case QRErrorCorrectLevel.H :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+	default :
+		return undefined;
+	}
+};
+
+module.exports = QRRSBlock;
+
+  };
+  M['QRUtil'] = function (module, exports, require) {
+var QRMode = require('./QRMode');
+var QRPolynomial = require('./QRPolynomial');
+var QRMath = require('./QRMath');
+var QRMaskPattern = require('./QRMaskPattern');
+
+var QRUtil = {
+
+    PATTERN_POSITION_TABLE : [
+        [],
+        [6, 18],
+        [6, 22],
+        [6, 26],
+        [6, 30],
+        [6, 34],
+        [6, 22, 38],
+        [6, 24, 42],
+        [6, 26, 46],
+        [6, 28, 50],
+        [6, 30, 54],        
+        [6, 32, 58],
+        [6, 34, 62],
+        [6, 26, 46, 66],
+        [6, 26, 48, 70],
+        [6, 26, 50, 74],
+        [6, 30, 54, 78],
+        [6, 30, 56, 82],
+        [6, 30, 58, 86],
+        [6, 34, 62, 90],
+        [6, 28, 50, 72, 94],
+        [6, 26, 50, 74, 98],
+        [6, 30, 54, 78, 102],
+        [6, 28, 54, 80, 106],
+        [6, 32, 58, 84, 110],
+        [6, 30, 58, 86, 114],
+        [6, 34, 62, 90, 118],
+        [6, 26, 50, 74, 98, 122],
+        [6, 30, 54, 78, 102, 126],
+        [6, 26, 52, 78, 104, 130],
+        [6, 30, 56, 82, 108, 134],
+        [6, 34, 60, 86, 112, 138],
+        [6, 30, 58, 86, 114, 142],
+        [6, 34, 62, 90, 118, 146],
+        [6, 30, 54, 78, 102, 126, 150],
+        [6, 24, 50, 76, 102, 128, 154],
+        [6, 28, 54, 80, 106, 132, 158],
+        [6, 32, 58, 84, 110, 136, 162],
+        [6, 26, 54, 82, 110, 138, 166],
+        [6, 30, 58, 86, 114, 142, 170]
+    ],
+
+    G15 : (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+    G18 : (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+    G15_MASK : (1 << 14) | (1 << 12) | (1 << 10)    | (1 << 4) | (1 << 1),
+
+    getBCHTypeInfo : function(data) {
+        var d = data << 10;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+            d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );    
+        }
+        return ( (data << 10) | d) ^ QRUtil.G15_MASK;
+    },
+
+    getBCHTypeNumber : function(data) {
+        var d = data << 12;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+            d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );    
+        }
+        return (data << 12) | d;
+    },
+
+    getBCHDigit : function(data) {
+
+        var digit = 0;
+
+        while (data !== 0) {
+            digit++;
+            data >>>= 1;
+        }
+
+        return digit;
+    },
+
+    getPatternPosition : function(typeNumber) {
+        return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
+    },
+
+    getMask : function(maskPattern, i, j) {
+        
+        switch (maskPattern) {
+            
+        case QRMaskPattern.PATTERN000 : return (i + j) % 2 === 0;
+        case QRMaskPattern.PATTERN001 : return i % 2 === 0;
+        case QRMaskPattern.PATTERN010 : return j % 3 === 0;
+        case QRMaskPattern.PATTERN011 : return (i + j) % 3 === 0;
+        case QRMaskPattern.PATTERN100 : return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 === 0;
+        case QRMaskPattern.PATTERN101 : return (i * j) % 2 + (i * j) % 3 === 0;
+        case QRMaskPattern.PATTERN110 : return ( (i * j) % 2 + (i * j) % 3) % 2 === 0;
+        case QRMaskPattern.PATTERN111 : return ( (i * j) % 3 + (i + j) % 2) % 2 === 0;
+
+        default :
+            throw new Error("bad maskPattern:" + maskPattern);
+        }
+    },
+
+    getErrorCorrectPolynomial : function(errorCorrectLength) {
+
+        var a = new QRPolynomial([1], 0);
+
+        for (var i = 0; i < errorCorrectLength; i++) {
+            a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0) );
+        }
+
+        return a;
+    },
+
+    getLengthInBits : function(mode, type) {
+
+        if (1 <= type && type < 10) {
+
+            // 1 - 9
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 10;
+            case QRMode.MODE_ALPHA_NUM  : return 9;
+            case QRMode.MODE_8BIT_BYTE  : return 8;
+            case QRMode.MODE_KANJI      : return 8;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 27) {
+
+            // 10 - 26
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 12;
+            case QRMode.MODE_ALPHA_NUM  : return 11;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 10;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 41) {
+
+            // 27 - 40
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 14;
+            case QRMode.MODE_ALPHA_NUM  : return 13;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 12;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else {
+            throw new Error("type:" + type);
+        }
+    },
+
+    getLostPoint : function(qrCode) {
+        
+        var moduleCount = qrCode.getModuleCount();
+        var lostPoint = 0;
+        var row = 0; 
+        var col = 0;
+
+        
+        // LEVEL1
+        
+        for (row = 0; row < moduleCount; row++) {
+
+            for (col = 0; col < moduleCount; col++) {
+
+                var sameCount = 0;
+                var dark = qrCode.isDark(row, col);
+
+                for (var r = -1; r <= 1; r++) {
+
+                    if (row + r < 0 || moduleCount <= row + r) {
+                        continue;
+                    }
+
+                    for (var c = -1; c <= 1; c++) {
+
+                        if (col + c < 0 || moduleCount <= col + c) {
+                            continue;
+                        }
+
+                        if (r === 0 && c === 0) {
+                            continue;
+                        }
+
+                        if (dark === qrCode.isDark(row + r, col + c) ) {
+                            sameCount++;
+                        }
+                    }
+                }
+
+                if (sameCount > 5) {
+                    lostPoint += (3 + sameCount - 5);
+                }
+            }
+        }
+
+        // LEVEL2
+
+        for (row = 0; row < moduleCount - 1; row++) {
+            for (col = 0; col < moduleCount - 1; col++) {
+                var count = 0;
+                if (qrCode.isDark(row,     col    ) ) count++;
+                if (qrCode.isDark(row + 1, col    ) ) count++;
+                if (qrCode.isDark(row,     col + 1) ) count++;
+                if (qrCode.isDark(row + 1, col + 1) ) count++;
+                if (count === 0 || count === 4) {
+                    lostPoint += 3;
+                }
+            }
+        }
+
+        // LEVEL3
+
+        for (row = 0; row < moduleCount; row++) {
+            for (col = 0; col < moduleCount - 6; col++) {
+                if (qrCode.isDark(row, col) && 
+                        !qrCode.isDark(row, col + 1) && 
+                         qrCode.isDark(row, col + 2) && 
+                         qrCode.isDark(row, col + 3) && 
+                         qrCode.isDark(row, col + 4) && 
+                        !qrCode.isDark(row, col + 5) && 
+                         qrCode.isDark(row, col + 6) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount - 6; row++) {
+                if (qrCode.isDark(row, col) &&
+                        !qrCode.isDark(row + 1, col) &&
+                         qrCode.isDark(row + 2, col) &&
+                         qrCode.isDark(row + 3, col) &&
+                         qrCode.isDark(row + 4, col) &&
+                        !qrCode.isDark(row + 5, col) &&
+                         qrCode.isDark(row + 6, col) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        // LEVEL4
+        
+        var darkCount = 0;
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount; row++) {
+                if (qrCode.isDark(row, col) ) {
+                    darkCount++;
+                }
+            }
+        }
+        
+        var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+        lostPoint += ratio * 10;
+
+        return lostPoint;       
+    }
+
+};
+
+module.exports = QRUtil;
+
+  };
+  M['index'] = function (module, exports, require) {
+//---------------------------------------------------------------------
+// QRCode for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//   http://www.opensource.org/licenses/mit-license.php
+//
+// The word "QR Code" is registered trademark of 
+// DENSO WAVE INCORPORATED
+//   http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+// Modified to work in node for this project (and some refactoring)
+//---------------------------------------------------------------------
+
+var QR8bitByte = require('./QR8bitByte');
+var QRUtil = require('./QRUtil');
+var QRPolynomial = require('./QRPolynomial');
+var QRRSBlock = require('./QRRSBlock');
+var QRBitBuffer = require('./QRBitBuffer');
+
+function QRCode(typeNumber, errorCorrectLevel) {
+	this.typeNumber = typeNumber;
+	this.errorCorrectLevel = errorCorrectLevel;
+	this.modules = null;
+	this.moduleCount = 0;
+	this.dataCache = null;
+	this.dataList = [];
+}
+
+QRCode.prototype = {
+	
+	addData : function(data) {
+		var newData = new QR8bitByte(data);
+		this.dataList.push(newData);
+		this.dataCache = null;
+	},
+	
+	isDark : function(row, col) {
+		if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+			throw new Error(row + "," + col);
+		}
+		return this.modules[row][col];
+	},
+
+	getModuleCount : function() {
+		return this.moduleCount;
+	},
+	
+	make : function() {
+		// Calculate automatically typeNumber if provided is < 1
+		if (this.typeNumber < 1 ){
+			var typeNumber = 1;
+			for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+
+				var buffer = new QRBitBuffer();
+				var totalDataCount = 0;
+				for (var i = 0; i < rsBlocks.length; i++) {
+					totalDataCount += rsBlocks[i].dataCount;
+				}
+
+				for (var x = 0; x < this.dataList.length; x++) {
+					var data = this.dataList[x];
+					buffer.put(data.mode, 4);
+					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+					data.write(buffer);
+				}
+				if (buffer.getLengthInBits() <= totalDataCount * 8)
+					break;
+			}
+			this.typeNumber = typeNumber;
+		}
+		this.makeImpl(false, this.getBestMaskPattern() );
+	},
+	
+	makeImpl : function(test, maskPattern) {
+		
+		this.moduleCount = this.typeNumber * 4 + 17;
+		this.modules = new Array(this.moduleCount);
+		
+		for (var row = 0; row < this.moduleCount; row++) {
+			
+			this.modules[row] = new Array(this.moduleCount);
+			
+			for (var col = 0; col < this.moduleCount; col++) {
+				this.modules[row][col] = null;//(col + row) % 3;
+			}
+		}
+	
+		this.setupPositionProbePattern(0, 0);
+		this.setupPositionProbePattern(this.moduleCount - 7, 0);
+		this.setupPositionProbePattern(0, this.moduleCount - 7);
+		this.setupPositionAdjustPattern();
+		this.setupTimingPattern();
+		this.setupTypeInfo(test, maskPattern);
+		
+		if (this.typeNumber >= 7) {
+			this.setupTypeNumber(test);
+		}
+	
+		if (this.dataCache === null) {
+			this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+		}
+	
+		this.mapData(this.dataCache, maskPattern);
+	},
+
+	setupPositionProbePattern : function(row, col)  {
+		
+		for (var r = -1; r <= 7; r++) {
+			
+			if (row + r <= -1 || this.moduleCount <= row + r) continue;
+			
+			for (var c = -1; c <= 7; c++) {
+				
+				if (col + c <= -1 || this.moduleCount <= col + c) continue;
+				
+				if ( (0 <= r && r <= 6 && (c === 0 || c === 6) ) || 
+                     (0 <= c && c <= 6 && (r === 0 || r === 6) ) || 
+                     (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+					this.modules[row + r][col + c] = true;
+				} else {
+					this.modules[row + r][col + c] = false;
+				}
+			}		
+		}		
+	},
+	
+	getBestMaskPattern : function() {
+	
+		var minLostPoint = 0;
+		var pattern = 0;
+	
+		for (var i = 0; i < 8; i++) {
+			
+			this.makeImpl(true, i);
+	
+			var lostPoint = QRUtil.getLostPoint(this);
+	
+			if (i === 0 || minLostPoint >  lostPoint) {
+				minLostPoint = lostPoint;
+				pattern = i;
+			}
+		}
+	
+		return pattern;
+	},
+	
+	createMovieClip : function(target_mc, instance_name, depth) {
+	
+		var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
+		var cs = 1;
+	
+		this.make();
+
+		for (var row = 0; row < this.modules.length; row++) {
+			
+			var y = row * cs;
+			
+			for (var col = 0; col < this.modules[row].length; col++) {
+	
+				var x = col * cs;
+				var dark = this.modules[row][col];
+			
+				if (dark) {
+					qr_mc.beginFill(0, 100);
+					qr_mc.moveTo(x, y);
+					qr_mc.lineTo(x + cs, y);
+					qr_mc.lineTo(x + cs, y + cs);
+					qr_mc.lineTo(x, y + cs);
+					qr_mc.endFill();
+				}
+			}
+		}
+		
+		return qr_mc;
+	},
+
+	setupTimingPattern : function() {
+		
+		for (var r = 8; r < this.moduleCount - 8; r++) {
+			if (this.modules[r][6] !== null) {
+				continue;
+			}
+			this.modules[r][6] = (r % 2 === 0);
+		}
+	
+		for (var c = 8; c < this.moduleCount - 8; c++) {
+			if (this.modules[6][c] !== null) {
+				continue;
+			}
+			this.modules[6][c] = (c % 2 === 0);
+		}
+	},
+	
+	setupPositionAdjustPattern : function() {
+	
+		var pos = QRUtil.getPatternPosition(this.typeNumber);
+		
+		for (var i = 0; i < pos.length; i++) {
+		
+			for (var j = 0; j < pos.length; j++) {
+			
+				var row = pos[i];
+				var col = pos[j];
+				
+				if (this.modules[row][col] !== null) {
+					continue;
+				}
+				
+				for (var r = -2; r <= 2; r++) {
+				
+					for (var c = -2; c <= 2; c++) {
+					
+						if (Math.abs(r) === 2 || 
+                            Math.abs(c) === 2 ||
+                            (r === 0 && c === 0) ) {
+							this.modules[row + r][col + c] = true;
+						} else {
+							this.modules[row + r][col + c] = false;
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	setupTypeNumber : function(test) {
+	
+		var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+        var mod;
+	
+		for (var i = 0; i < 18; i++) {
+			mod = (!test && ( (bits >> i) & 1) === 1);
+			this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+		}
+	
+		for (var x = 0; x < 18; x++) {
+			mod = (!test && ( (bits >> x) & 1) === 1);
+			this.modules[x % 3 + this.moduleCount - 8 - 3][Math.floor(x / 3)] = mod;
+		}
+	},
+	
+	setupTypeInfo : function(test, maskPattern) {
+	
+		var data = (this.errorCorrectLevel << 3) | maskPattern;
+		var bits = QRUtil.getBCHTypeInfo(data);
+        var mod;
+	
+		// vertical		
+		for (var v = 0; v < 15; v++) {
+	
+			mod = (!test && ( (bits >> v) & 1) === 1);
+	
+			if (v < 6) {
+				this.modules[v][8] = mod;
+			} else if (v < 8) {
+				this.modules[v + 1][8] = mod;
+			} else {
+				this.modules[this.moduleCount - 15 + v][8] = mod;
+			}
+		}
+	
+		// horizontal
+		for (var h = 0; h < 15; h++) {
+	
+			mod = (!test && ( (bits >> h) & 1) === 1);
+			
+			if (h < 8) {
+				this.modules[8][this.moduleCount - h - 1] = mod;
+			} else if (h < 9) {
+				this.modules[8][15 - h - 1 + 1] = mod;
+			} else {
+				this.modules[8][15 - h - 1] = mod;
+			}
+		}
+	
+		// fixed module
+		this.modules[this.moduleCount - 8][8] = (!test);
+	
+	},
+	
+	mapData : function(data, maskPattern) {
+		
+		var inc = -1;
+		var row = this.moduleCount - 1;
+		var bitIndex = 7;
+		var byteIndex = 0;
+		
+		for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+	
+			if (col === 6) col--;
+	
+			while (true) {
+	
+				for (var c = 0; c < 2; c++) {
+					
+					if (this.modules[row][col - c] === null) {
+						
+						var dark = false;
+	
+						if (byteIndex < data.length) {
+							dark = ( ( (data[byteIndex] >>> bitIndex) & 1) === 1);
+						}
+	
+						var mask = QRUtil.getMask(maskPattern, row, col - c);
+	
+						if (mask) {
+							dark = !dark;
+						}
+						
+						this.modules[row][col - c] = dark;
+						bitIndex--;
+	
+						if (bitIndex === -1) {
+							byteIndex++;
+							bitIndex = 7;
+						}
+					}
+				}
+								
+				row += inc;
+	
+				if (row < 0 || this.moduleCount <= row) {
+					row -= inc;
+					inc = -inc;
+					break;
+				}
+			}
+		}
+		
+	}
+
+};
+
+QRCode.PAD0 = 0xEC;
+QRCode.PAD1 = 0x11;
+
+QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
+	
+	var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+	
+	var buffer = new QRBitBuffer();
+	
+	for (var i = 0; i < dataList.length; i++) {
+		var data = dataList[i];
+		buffer.put(data.mode, 4);
+		buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+		data.write(buffer);
+	}
+
+	// calc num max data.
+	var totalDataCount = 0;
+	for (var x = 0; x < rsBlocks.length; x++) {
+		totalDataCount += rsBlocks[x].dataCount;
+	}
+
+	if (buffer.getLengthInBits() > totalDataCount * 8) {
+		throw new Error("code length overflow. (" + 
+            buffer.getLengthInBits() + 
+            ">" +  
+            totalDataCount * 8 + 
+            ")");
+	}
+
+	// end code
+	if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+		buffer.put(0, 4);
+	}
+
+	// padding
+	while (buffer.getLengthInBits() % 8 !== 0) {
+		buffer.putBit(false);
+	}
+
+	// padding
+	while (true) {
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD0, 8);
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD1, 8);
+	}
+
+	return QRCode.createBytes(buffer, rsBlocks);
+};
+
+QRCode.createBytes = function(buffer, rsBlocks) {
+
+	var offset = 0;
+	
+	var maxDcCount = 0;
+	var maxEcCount = 0;
+	
+	var dcdata = new Array(rsBlocks.length);
+	var ecdata = new Array(rsBlocks.length);
+	
+	for (var r = 0; r < rsBlocks.length; r++) {
+
+		var dcCount = rsBlocks[r].dataCount;
+		var ecCount = rsBlocks[r].totalCount - dcCount;
+
+		maxDcCount = Math.max(maxDcCount, dcCount);
+		maxEcCount = Math.max(maxEcCount, ecCount);
+		
+		dcdata[r] = new Array(dcCount);
+		
+		for (var i = 0; i < dcdata[r].length; i++) {
+			dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+		}
+		offset += dcCount;
+		
+		var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+		var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+		var modPoly = rawPoly.mod(rsPoly);
+		ecdata[r] = new Array(rsPoly.getLength() - 1);
+		for (var x = 0; x < ecdata[r].length; x++) {
+            var modIndex = x + modPoly.getLength() - ecdata[r].length;
+			ecdata[r][x] = (modIndex >= 0)? modPoly.get(modIndex) : 0;
+		}
+
+	}
+	
+	var totalCodeCount = 0;
+	for (var y = 0; y < rsBlocks.length; y++) {
+		totalCodeCount += rsBlocks[y].totalCount;
+	}
+
+	var data = new Array(totalCodeCount);
+	var index = 0;
+
+	for (var z = 0; z < maxDcCount; z++) {
+		for (var s = 0; s < rsBlocks.length; s++) {
+			if (z < dcdata[s].length) {
+				data[index++] = dcdata[s][z];
+			}
+		}
+	}
+
+	for (var xx = 0; xx < maxEcCount; xx++) {
+		for (var t = 0; t < rsBlocks.length; t++) {
+			if (xx < ecdata[t].length) {
+				data[index++] = ecdata[t][xx];
+			}
+		}
+	}
+
+	return data;
+
+};
+
+module.exports = QRCode;
+
+  };
+  return req('index');
+})();
+// Matriz de módulos (true = negro) para un texto, eligiendo la versión más pequeña que quepa
+function qrMatrix(text, ecl = 0 /* M */) {
+  for (let v = 1; v <= 40; v++) {
+    try {
+      const q = new QRLIB(v, ecl); q.addData(text); q.make();
+      const n = q.getModuleCount(), m = [];
+      for (let r = 0; r < n; r++) { const row = []; for (let c = 0; c < n; c++) row.push(q.isDark(r, c)); m.push(row); }
+      return m;
+    } catch (e) { /* no cabe: probamos la siguiente versión */ }
+  }
+  return null;
+}
+
 /* ================== utilidades ================== */
 // En la app de Android existe window.AndroidBridge (voz, tiempo, GPS y portapapeles nativos)
 const ANDROID = typeof window.AndroidBridge !== "undefined";
@@ -14081,9 +15401,10 @@ const S = {
   view: "noche",
   rate: store.get("rate2", 1),
   voice: store.get("voice2", ""),
-  red: store.get("red", false)
+  red: store.get("red", false),
+  obs: store.get("obs", "tele") // con qué observa: ojo, prism, tele, dwarf
 };
-const place = () => S.places[Math.min(S.placeIdx, S.places.length - 1)] || DEFAULT_PLACES[0];
+const place = () => S.pub?.place || S.places[Math.min(S.placeIdx, S.places.length - 1)] || DEFAULT_PLACES[0];
 /* ===== Qué mostrar: filtros compartidos por el mapa, «Lo mejor» y el Dwarf ===== */
 const FLT_DEFAULT = { gal: true, neb: true, clu: true, star: true, pl: true, m: true, dest: true, ngc: false, mag: 9, labels: true };
 S.flt = { ...FLT_DEFAULT, ...store.get("flt", {}) };
@@ -14730,12 +16051,13 @@ function moonFreeWindow(n) {
   if (!best.m) return { txt: "Ninguna", sub: "La Luna está fuera toda la noche oscura" };
   return { txt: `${fmtT(best.s)} – ${fmtT(new Date(best.e.getTime() + 15 * 60000))}`, sub: `${nf1.format(best.m / 60)} h para lo más débil (galaxias)` };
 }
+const underCap = o => o.kind !== "dso" || (o.mag ?? 99) <= obsCap();
 function bestList(n = 12) {
-  const pool = S.flt.ngc && S.flt.mag > 11 ? DSOS.filter(o => passes(o)) : FEATURED.filter(o => passes(o));
+  const pool = (S.flt.ngc && S.flt.mag > 11 ? DSOS.filter(o => passes(o)) : FEATURED.filter(o => passes(o))).filter(underCap);
   return pool.map(o => ({ o, t: track(o) })).filter(x => x.t.hours30 >= 0.5).sort((a, b) => b.t.score - a.t.score).slice(0, n);
 }
 function nightList() {
-  const pool = S.flt.ngc && S.flt.mag > 11 ? DSOS.filter(o => passes(o)) : FEATURED.filter(o => passes(o));
+  const pool = (S.flt.ngc && S.flt.mag > 11 ? DSOS.filter(o => passes(o)) : FEATURED.filter(o => passes(o))).filter(underCap);
   // los marcados siempre entran, aunque los filtros los dejen fuera
   for (const k of S.sel) { const o = BY_KEY[k]; if (o && o.kind === "dso" && !pool.includes(o)) pool.push(o); }
   let list = pool.map(o => ({ o, t: track(o) })).filter(x => x.t.maxAlt > 15 || S.sel.has(x.o.key));
@@ -14962,6 +16284,7 @@ function buildCharla() {
   const dur = +$("ch-dur").value, eq = $("ch-eq").value, lvl = $("ch-lvl").value;
   const mid = new Date(start.getTime() + dur * 30000);
   const kids = lvl === "ninos";
+  const last = $("ch-rep").value === "si" ? chLast() : null;
   // 1. Imprescindibles: siempre la polar, la Osa Mayor o Casiopea (la que esté más alta), la Luna y los planetas visibles
   const ess = [{ o: BY_KEY.polaris, intro: true }], extraPl = [];
   const uma = consHoriz("UMa", start).alt, cas = consHoriz("Cas", start).alt;
@@ -14986,51 +16309,95 @@ function buildCharla() {
   } else DSOS.filter(o => o.mag <= dsoLim && !["AST", "DS", "DN"].includes(o.type) && (o.id.startsWith("M") || ["NGC 869", "Cr 399"].includes(o.id))).map(o => ({ o, h: horiz(o, mid, p) }))
     .filter(x => x.h.alt > 25).sort((a, b) => a.o.mag - b.o.mag).slice(0, 10)
     .forEach((x, i) => today.push({ o: x.o, prio: 70 - i * 2 - Math.max(0, x.o.mag - 4) * 2 }));
-  const chosen = today.filter((c, i, arr) => arr.findIndex(d => d.o === c.o) === i).sort((a, b) => b.prio - a.prio).slice(0, maxToday);
+  let pool = today.filter((c, i, arr) => arr.findIndex(d => d.o === c.o) === i);
+  // mismo grupo: quitamos lo que ya se contó en la última charla (si queda suficiente)
+  if (last) { const fresh = pool.filter(c => !last.keys.includes(c.o.key)); if (fresh.length >= 3) pool = fresh; }
+  // charla seguida por QR: los mismos objetos que el presentador
+  if (S.pub?.k?.length) pool = S.pub.k.map(k => BY_KEY[k]).filter(Boolean).map((o, i) => ({ o, prio: 100 - i }));
+  const chosen = pool.sort((a, b) => b.prio - a.prio).slice(0, S.pub?.k?.length || maxToday);
   chosen.forEach(c => { const h = horiz(c.o, start, p); c.order = (h.az > 180 ? 0 : 1000) + (h.az > 180 ? 360 - h.az : h.az); });
   chosen.sort((a, b) => a.order - b.order);
   // 3. Leyenda de la noche: una constelación visible con mito, distinta cada día
   const legEnd = new Date(start.getTime() + dur * 60000 * 0.9);
-  const leg = legendOfNight(legEnd, [guide]);
-  const blocks = [["ess", ess], ["hoy", chosen]];
+  const leg = S.pub ? (CONST_INFO[S.pub.l] ? S.pub.l : null) : legendOfNight(legEnd, [guide, ...(last?.leg ? [last.leg] : [])]) || (last ? legendOfNight(legEnd, [guide]) : null);
+  // 0. Lo especial de esta noche: efemérides entre el mediodía de hoy y el de mañana
+  const t0 = n.date.getTime() + 12 * 3600000, t1 = t0 + 24 * 3600000;
+  const evs = ephList(new Date(n.date), 2).filter(e => e.t.getTime() >= t0 && e.t.getTime() < t1 && (e.kind !== "luna" || e.super || ephImportant(e)))
+    .sort((x, y) => ephImportant(y) - ephImportant(x)).slice(0, 2);
+  // Cierre: el «¿Sabías que…?» del día (otro distinto si es el mismo grupo)
+  let fi = S.pub && Number.isFinite(S.pub.f) ? S.pub.f : FACT_DAY[mmdd(n.date)];
+  if (!S.pub && last && last.fact === fi) fi = (fi + 1) % ALL_FACTS.length;
+  const blocks = [];
+  if (evs.length) blocks.push(["ev", evs.map(e => ({ ev: e }))]);
+  blocks.push(["ess", ess], ["hoy", chosen]);
   if (leg) blocks.push(["ley", [{ cn: leg, legend: true }]]);
+  if (ALL_FACTS[fi]) blocks.push(["sab", [{ fact: fi }]]);
+  CH_META = { keys: chosen.map(c => c.o.key), leg, fact: fi, night: n.date.toDateString(), date: n.date };
   const all = blocks.flatMap(([b, arr]) => arr.map(x => ({ ...x, block: b })));
   const step = dur / all.length;
   CHARLA = all.map((c, i) => {
     const t = new Date(start.getTime() + i * step * 60000);
+    if (c.ev) {
+      const e = c.ev, tg = ephTarget(e), ob = BY_KEY[e.b] || (tg === "Luna" ? BY_KEY.luna : null);
+      const h = ob ? horiz(ob, t, p) : null;
+      return { ev: e, block: c.block, title: ephTitle(e), t, h, look: h && h.alt > 0 ? lookText(h) : "", see: dayLabel(e.t), text: (kids ? "¡Esta noche pasa algo especial! " : "Esta noche tenemos algo especial. ") + ephText(e), guide: tg };
+    }
+    if (c.fact != null) {
+      const f = ALL_FACTS[c.fact];
+      return { fact: c.fact, block: c.block, title: "¿Sabías que…?", t, h: null, look: "", see: "", text: f.t + (/[.!?…]$/.test(f.t) ? " " : ". ") + f.d };
+    }
     if (c.cn) {
       const h = consHoriz(c.cn, t, p), info = CONST_INFO[c.cn] || {};
       let text;
       if (c.legend) text = (kids ? "Y para terminar, un cuento que está escrito en las estrellas. " : "Terminamos con la leyenda de esta noche. ") + info.t;
       else if (c.cn === "UMa") text = kids ? "Ahora buscamos siete estrellas que forman un carro o un cazo: es la Osa Mayor. Si sigues las dos estrellas del final del cazo hacia arriba, llegas a la estrella polar." : "La Osa Mayor, con sus siete estrellas del Carro, es la gran referencia del cielo del norte. Prolongando unas cinco veces la distancia entre las dos estrellas del extremo del cazo, Merak y Dubhe, llegamos a la estrella polar. Y siguiendo la curva del mango, «arco hacia Arturo», encontramos la estrella más brillante de la primavera.";
       else text = kids ? "Ahora buscamos una W o una M hecha con cinco estrellas: es Casiopea, una reina que está sentada en su trono. Está al otro lado de la polar que la Osa Mayor." : "Casiopea, con su forma de W o de M, está al otro lado de la polar respecto a la Osa Mayor: cuando una está baja, la otra está alta. El vértice central de la W apunta, aproximadamente, hacia la estrella polar. Muy cerca, en Perseo, está la Doble Cúmulo, y siguiendo hacia Andrómeda llegamos a su galaxia.";
-      return { cn: c.cn, block: c.block, title: consName(c.cn), t, h, look: lookText(h), see: c.legend ? (info.mito ? "Leyenda clásica" : "") : "A simple vista", text };
+      return { cn: c.cn, block: c.block, title: consName(c.cn), t, h, look: lookText(h), see: c.legend ? (info.mito ? "Leyenda clásica" : "") : "A simple vista", text, guide: consName(c.cn) };
     }
     const h = horiz(c.o, t, p);
     let intro = "";
     if (c.intro) intro = kids ? "Empezamos buscando la estrella polar: casi no se mueve en toda la noche y nos dice dónde está el norte. " : "Empezamos orientándonos con la estrella polar, que marca el norte y apenas se mueve: todo el cielo gira a su alrededor. ";
     const see = howToSee(c.o) + (eq !== "ojo" ? " " + adviceShort(c.o) : "");
-    return { o: c.o, block: c.block, title: label(c.o), t, h, look: lookText(h), see, text: intro + speechText(c.o, lvl) };
+    return { o: c.o, block: c.block, title: label(c.o), t, h, look: lookText(h), see, text: intro + speechText(c.o, lvl), guide: shortLabel(c.o) };
   });
   renderCharla();
+  syncChRep();
+}
+let CH_META = null;
+/* Historial de charlas dadas: para no repetir con el mismo grupo */
+const chHist = () => store.get("chHist", []);
+function chLast() { const tonight = getNight().date.toDateString(); return chHist().filter(h => h.night !== tonight).sort((a, b) => b.at - a.at)[0] || null; }
+function chRecord() {
+  if (S.pub || !CH_META) return;
+  const h = chHist().filter(x => x.night !== CH_META.night);
+  h.push({ night: CH_META.night, d: CH_META.date.toISOString().slice(0, 10), keys: CH_META.keys, leg: CH_META.leg, fact: CH_META.fact, at: Date.now() });
+  store.set("chHist", h.sort((a, b) => b.at - a.at).slice(0, 12));
+  syncChRep();
+}
+function syncChRep() {
+  const l = chLast(), el = $("ch-rep-note"); if (!el) return;
+  el.textContent = l ? `Última charla guardada: ${new Date(l.d + "T12:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" })}${l.leg ? " · leyenda de " + consName(l.leg) : ""}. Se guarda sola al presentarla o leerla.` : "Aún no hay charlas guardadas: se guardan solas al presentarlas o leerlas.";
 }
 const CH_BLOCKS = {
   ess: ["Lo imprescindible", "Se enseña en todas las charlas: orientarse y lo más brillante."],
   hoy: ["Hoy en el cielo", "Cambia cada noche según lo que esté bien alto a esta hora."],
-  ley: ["La leyenda de la noche", "Una constelación visible esta noche y su historia. Cambia cada día."]
+  ley: ["La leyenda de la noche", "Una constelación visible esta noche y su historia. Cambia cada día."],
+  ev: ["Lo especial de esta noche", "Lo que solo pasa hoy: lluvias de estrellas, conjunciones, eclipses…"],
+  sab: ["Para terminar: ¿sabías que…?", "El dato curioso del día, distinto cada día del año."]
 };
 function renderCharla() {
   let last = "";
   $("charla-list").innerHTML = CHARLA.length ? CHARLA.map((s, i) => {
     let head = "";
     if (s.block !== last) { last = s.block; const [t, d] = CH_BLOCKS[s.block]; head = `<div class="ch-block"><h3>${t}</h3><p>${d}</p></div>`; }
-    const ficha = s.cn ? `<a class="btn ghost" href="#constelaciones" data-cn-go="${s.cn}">Ver constelación</a>` : `<button class="btn ghost" type="button" data-key="${s.o.key}">Ver ficha</button>`;
+    const ficha = s.cn ? `<a class="btn ghost" href="#constelaciones" data-cn-go="${s.cn}">Ver constelación</a>` : s.o ? `<button class="btn ghost" type="button" data-key="${s.o.key}">Ver ficha</button>` : "";
+    const guide = s.guide ? `<button class="btn guide" type="button" data-guide="${esc(s.guide)}">Guíame</button>` : "";
     return head + `<div class="stop" id="stop-${i}">
       <div class="when">${fmtT(s.t)}</div>
       <div class="body"><h3>${esc(s.title)}</h3>
-        <p><strong>${esc(s.look)}</strong> <span class="muted">${esc(s.see)}</span></p>
+        ${s.look || s.see ? `<p><strong>${esc(s.look)}</strong> <span class="muted">${esc(s.see)}</span></p>` : ""}
         <p>${esc(s.text)}</p>
-        <div class="row"><button class="btn" type="button" data-say="${i}">Escuchar</button>${ficha}</div>
+        <div class="row">${guide}<button class="btn" type="button" data-say="${i}">Escuchar</button>${ficha}</div>
       </div></div>`;
   }).join("") : `<p class="empty">Elige la hora de inicio para preparar la charla.</p>`;
 }
@@ -15698,7 +17065,6 @@ const AR = {
     this.init();
     const box = $("ar"); box.hidden = false; this.on = true; this.R = null; this.sensor = false; this.iosOff = null; this.absSeen = false;
     document.body.style.overflow = "hidden";
-    $("ar-red").setAttribute("aria-pressed", S.red ? "true" : "false");
     $("ar-sens").hidden = true; this.viaSensor = false;
     const sp = this.sensors();
     this.refreshBodies(new Date()); this.M = this.matrix(new Date()); this.mT = Date.now();
@@ -15954,7 +17320,7 @@ function presShow(i) {
   $("pres-count").textContent = `${PRES.i + 1} / ${CHARLA.length}`;
   const vis = $("pres-vis");
   if (s.cn) { vis.innerHTML = `<canvas id="pres-canvas"></canvas>`; requestAnimationFrame(() => drawConst($("pres-canvas"), s.cn)); }
-  else vis.innerHTML = presCompass(s.h);
+  else vis.innerHTML = s.h && s.h.alt > 0 ? presCompass(s.h) : "";
   if (PRES.auto) Voice.say([s.title + ". " + s.look + " " + s.text]);
 }
 function presCompass(h) {
@@ -15971,6 +17337,7 @@ function presCompass(h) {
 function presOpen() {
   if (!CHARLA.length) buildCharla();
   if (!CHARLA.length) { toast("Prepara primero la charla"); return; }
+  chRecord();
   $("pres").hidden = false; PRES.on = true; PRES.t0 = Date.now();
   document.body.style.overflow = "hidden";
   try { $("pres").requestFullscreen && $("pres").requestFullscreen().catch(() => {}); } catch { /* nada */ }
@@ -16029,8 +17396,34 @@ document.addEventListener("click", e => {
 });
 
 /* ================== Navegación en el móvil ================== */
-function renderMoreSheet() {
-  $("more-sheet").innerHTML = [...document.querySelectorAll("nav.tabs a:not([data-main])")].map(a => `<a href="${a.getAttribute("href")}" data-view="${a.dataset.view}">${a.innerHTML}</a>`).join("");
+// Cada pestaña principal agrupa varias vistas: una barra de sub-secciones arriba
+const GROUPS = {
+  noche: [["noche", "Esta noche"], ["catalogo", "Catálogo"]],
+  cielo: [["cielo", "Apunta al cielo"], ["constelaciones", "Constelaciones"]],
+  charla: [["charla", "Charla"], ["aprende", "¿Sabías que…?"]],
+  ajustes: [["ajustes", "Mi equipo y ajustes"], ["diario", "Diario"]]
+};
+const MAIN_OF = { catalogo: "noche", constelaciones: "cielo", aprende: "charla", diario: "ajustes" };
+function renderSubnav(v) {
+  const g = MAIN_OF[v] || v, items = GROUPS[g];
+  document.querySelectorAll(".subnav").forEach(n => n.remove());
+  if (!items) return;
+  const sec = $("v-" + v); if (!sec) return;
+  const nav = document.createElement("nav"); nav.className = "subnav"; nav.setAttribute("aria-label", "Apartados");
+  nav.innerHTML = items.map(([k, t]) => `<a href="#${k}"${k === v ? ' aria-current="page"' : ""}>${t}</a>`).join("");
+  sec.prepend(nav);
+}
+const OBS = {
+  ojo: { n: "a simple vista", cap: 6, note: "Solo lo que se ve sin instrumentos: planetas, estrellas brillantes y los objetos más brillantes del cielo profundo." },
+  prism: { n: "prismáticos", cap: 8.5, note: "Objetos hasta magnitud 8,5: cúmulos, las galaxias y nebulosas más brillantes." },
+  tele: { n: "telescopio", cap: 99, note: "Todo lo que pasen los filtros de «Qué mostrar». Cada ficha te dice qué ocular y filtro usar con tu telescopio." },
+  dwarf: { n: "Dwarf 3", cap: 99, note: "Abajo tienes los objetivos para el Dwarf 3: encaje en el campo de la cámara tele, filtro y exposición, y tu plan de sesiones." }
+};
+const obsCap = () => (OBS[S.obs] || OBS.tele).cap;
+function syncObs() {
+  document.querySelectorAll("#obs-seg [data-obs]").forEach(b => b.setAttribute("aria-pressed", b.dataset.obs === S.obs ? "true" : "false"));
+  $("obs-note").textContent = (OBS[S.obs] || OBS.tele).note;
+  $("dwarf-block").hidden = S.obs !== "dwarf";
 }
 function syncCtlSum() {
   const d = S.time;
@@ -16058,18 +17451,22 @@ async function prepareTrip() {
 /* ================== navegación y render ================== */
 function setView(v) {
   if (!["inicio", "noche", "dwarf", "charla", "constelaciones", "aprende", "catalogo", "diario", "ajustes", "cielo", "efemerides"].includes(v)) v = "inicio";
+  let toDwarf = false;
+  if (v === "dwarf") { S.obs = "dwarf"; store.set("obs", "dwarf"); v = "noche"; toDwarf = true; }
   window.scrollTo(0, 0);
   S.view = v;
   document.querySelectorAll("section.view").forEach(s => s.classList.toggle("on", s.id === "v-" + v));
-  $("more-sheet").hidden = true; $("nav-more").setAttribute("aria-expanded", "false"); $("nav-more").classList.toggle("on", !document.querySelector(`nav.tabs a[data-main][data-view="${v}"]`));
-  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.dataset.view === v) { a.setAttribute("aria-current", "page"); const nav = a.parentElement; nav.scrollLeft = a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2; } else a.removeAttribute("aria-current"); });
+  const main = MAIN_OF[v] || v;
+  document.querySelectorAll("nav.tabs a, #nav-gear").forEach(a => { if (a.dataset.view === main) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  renderSubnav(v);
   render();
+  if (toDwarf) requestAnimationFrame(() => $("dwarf-block").scrollIntoView({ block: "start" }));
 }
 function render() {
   getNight();
   renderTiles();
   if (S.view === "noche") { renderMeteo(); renderPlanets(); renderBest(); drawSkyMap(); }
-  if (S.view === "dwarf") { renderMeteo(); renderDwarf(); renderPlan(); }
+  if (S.view === "noche") { syncObs(); if (S.obs === "dwarf") { renderDwarf(); renderPlan(); } }
   if (S.view === "inicio") renderHome();
   if (S.view === "charla") buildCharla();
   if (S.view === "constelaciones") renderConstList();
@@ -16120,8 +17517,8 @@ $("btn-now").addEventListener("click", () => { S.time = new Date(); S.follow = t
 $("btn-red").addEventListener("click", () => { S.red = !S.red; store.set("red", S.red); applyRed(); render(); });
 function applyRed() { document.documentElement.classList.toggle("rojo", S.red); $("btn-red").setAttribute("aria-pressed", S.red ? "true" : "false"); }
 ["dw-type", "dw-fit"].forEach(id => $(id).addEventListener("change", renderDwarf));
-["ch-start", "ch-dur", "ch-eq", "ch-lvl", "ch-src"].forEach(id => $(id).addEventListener("change", buildCharla));
-$("ch-play").addEventListener("click", () => { if (!CHARLA.length) buildCharla(); Voice.say(CHARLA.map((s, i) => `${i === 0 || CHARLA[i - 1].block !== s.block ? CH_BLOCKS[s.block][0] + ". " : ""}${fmtT(s.t).replace(":", " y ")}. ${s.title}. ${s.look} ${s.text}`), highlightStop); });
+["ch-start", "ch-dur", "ch-eq", "ch-lvl", "ch-src", "ch-rep"].forEach(id => $(id).addEventListener("change", buildCharla));
+$("ch-play").addEventListener("click", () => { if (!CHARLA.length) buildCharla(); chRecord(); Voice.say(CHARLA.map((s, i) => `${i === 0 || CHARLA[i - 1].block !== s.block ? CH_BLOCKS[s.block][0] + ". " : ""}${fmtT(s.t).replace(":", " y ")}. ${s.title}. ${s.look} ${s.text}`), highlightStop); });
 $("ch-copy").addEventListener("click", () => copy(charlaScript()));
 $("cat-q").addEventListener("input", renderCatalog);
 $("cn-q").addEventListener("input", renderConstList);
@@ -16130,14 +17527,12 @@ $("ar-start").addEventListener("click", () => { AR.setTarget($("ar-target-in").v
 $("ar-close").addEventListener("click", () => AR.stop());
 $("ar-sens").addEventListener("click", () => { if (AR.aos) { try { AR.aos.stop(); } catch { /* nada */ } AR.aos = null; } AR.hint("Activando sensores…"); AR.sensors(); });
 $("ar-cam").addEventListener("click", () => AR.camera(!AR.stream));
-$("ar-red").addEventListener("click", () => { S.red = !S.red; store.set("red", S.red); applyRed(); $("ar-red").setAttribute("aria-pressed", S.red ? "true" : "false"); });
 $("ar-target").addEventListener("change", () => AR.setTarget($("ar-target").value));
 ["eph-days", "eph-from"].forEach(id => $(id).addEventListener("change", renderEph));
 document.addEventListener("click", e => {
   const f = e.target.closest("[data-ephf]"); if (f) { EPH_SEL = f.dataset.ephf; renderEph(); return; }
   const sy = e.target.closest("[data-ephsay]"); if (sy) { const ev = EPH_SHOWN[+sy.dataset.ephsay]; Voice.say([ephTitle(ev) + ". " + ephText(ev)]); return; }
   const sk = e.target.closest("[data-ephsky]"); if (sk) { AR.setTarget(sk.dataset.ephsky); $("ar-target").value = sk.dataset.ephsky; AR.start(); return; }
-  const ms = e.target.closest("#more-sheet a"); if (ms) { $("more-sheet").hidden = true; }
 });
 $("ch-present").addEventListener("click", presOpen);
 $("pres-close").addEventListener("click", presClose);
@@ -16146,9 +17541,75 @@ $("pres-prev").addEventListener("click", () => presShow(PRES.i - 1));
 $("pres-say").addEventListener("click", () => { PRES.auto = !PRES.auto; $("pres-say").setAttribute("aria-pressed", PRES.auto ? "true" : "false"); if (PRES.auto) presShow(PRES.i); else Voice.stop && Voice.stop(); });
 $("pres").addEventListener("click", e => { if (e.target.closest("button")) return; const r = $("pres").getBoundingClientRect(); presShow(PRES.i + (e.clientX > r.width / 3 ? 1 : -1)); });
 $("ar-calib").addEventListener("click", arCalibOpen);
-$("nav-more").addEventListener("click", () => { const sh = $("more-sheet"); renderMoreSheet(); sh.hidden = !sh.hidden; $("nav-more").setAttribute("aria-expanded", sh.hidden ? "false" : "true"); });
 $("ctl-sum").addEventListener("click", () => { const c = document.querySelector(".controls"); c.classList.toggle("open"); $("ctl-sum").setAttribute("aria-expanded", c.classList.contains("open") ? "true" : "false"); });
 $("btn-trip").addEventListener("click", prepareTrip);
+$("obs-seg").addEventListener("click", e => { const b = e.target.closest("[data-obs]"); if (!b) return; S.obs = b.dataset.obs; store.set("obs", S.obs); S.listN = 40; syncChEq(); render(); });
+/* ================== QR para el público ================== */
+const PUBLIC_URL = "https://astrorusnucia.github.io/astrorus/";
+function charlaUrl() {
+  if (!CHARLA.length) buildCharla();
+  const p = place(), m = CH_META, d = m.date;
+  const q = new URLSearchParams({
+    pub: "1", d: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, h: $("ch-start").value || "21:00",
+    dur: $("ch-dur").value, lvl: $("ch-lvl").value, eq: $("ch-eq").value,
+    lat: (+p.lat).toFixed(4), lon: (+p.lon).toFixed(4), n: placeLabel(p), k: m.keys.join(","), l: m.leg || "", f: String(m.fact)
+  });
+  return PUBLIC_URL + "#charla?" + q.toString();
+}
+function drawQr(cv, text) {
+  const m = qrMatrix(text); if (!m) return false;
+  const n = m.length, quiet = 4, px = Math.floor(cv.width / (n + quiet * 2)), off = Math.floor((cv.width - px * n) / 2);
+  const x = cv.getContext("2d");
+  x.fillStyle = S.red ? "#ffb0a6" : "#ffffff"; x.fillRect(0, 0, cv.width, cv.height);
+  x.fillStyle = "#000000";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (m[r][c]) x.fillRect(off + c * px, off + r * px, px, px);
+  return true;
+}
+function qrOpen() {
+  const url = charlaUrl();
+  if (!drawQr($("qr-canvas"), url)) { toast("No se pudo crear el código QR"); return; }
+  $("qr-cap").textContent = `Charla del ${fmtD(CH_META.date)} · ${placeLabel()}`;
+  $("qr-dlg").dataset.url = url;
+  chRecord();
+  $("qr-dlg").showModal();
+}
+// Quien escanea el QR: abre la misma charla (lugar, hora, objetos y leyenda) en modo rojo
+function initPublic() {
+  const h = location.hash.slice(1), qs = h.includes("?") ? h.slice(h.indexOf("?") + 1) : "";
+  const q = new URLSearchParams(qs);
+  if (q.get("pub") !== "1") return;
+  const lat = +q.get("lat"), lon = +q.get("lon");
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+  S.pub = { place: { name: q.get("n") || "Lugar de la charla", lat, lon }, k: (q.get("k") || "").split(",").filter(Boolean), l: q.get("l") || "", f: q.has("f") ? +q.get("f") : NaN };
+  S.autoLoc = false;
+  const d = q.get("d"); if (/^\d{4}-\d{2}-\d{2}$/.test(d || "")) { S.time = new Date(d + "T20:00"); S.follow = false; }
+  if (/^\d{1,2}:\d{2}$/.test(q.get("h") || "")) $("ch-start").value = q.get("h").padStart(5, "0");
+  [["dur", "ch-dur"], ["lvl", "ch-lvl"], ["eq", "ch-eq"]].forEach(([k, id]) => { const v = q.get(k); if (v && [...$(id).options].some(o => o.value === v)) $(id).value = v; });
+  S.red = true;
+  document.documentElement.classList.add("publico");
+  $("pub-banner").hidden = false;
+  $("pub-text").textContent = `Estás siguiendo la charla de esta noche en ${S.pub.place.name}. Los pasos son los mismos que está contando el guía.`;
+}
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-guide]"); if (!g) return;
+  AR.setTarget(g.dataset.guide); $("ar-target").value = g.dataset.guide; if (AR.target) AR.start();
+});
+// el botón rojo tiene que seguir a mano también en pantalla completa
+document.addEventListener("fullscreenchange", () => { const f = document.fullscreenElement; (f && f !== document.documentElement ? f : document.body).appendChild($("btn-red")); });
+$("qr-dl").hidden = !WEB; // descargar solo funciona en la web del navegador
+$("ch-qr").addEventListener("click", qrOpen);
+$("pres-qr").addEventListener("click", qrOpen);
+$("qr-close").addEventListener("click", () => $("qr-dlg").close());
+$("qr-dlg").addEventListener("click", e => { if (e.target === $("qr-dlg")) $("qr-dlg").close(); });
+$("qr-copy").addEventListener("click", () => copy($("qr-dlg").dataset.url || ""));
+$("qr-dl").addEventListener("click", () => {
+  // versión para imprimir: siempre en blanco y negro y en grande
+  const c = document.createElement("canvas"); c.width = c.height = 1200;
+  const red = S.red; S.red = false; drawQr(c, $("qr-dlg").dataset.url || charlaUrl()); S.red = red;
+  const a = document.createElement("a"); a.href = c.toDataURL("image/png"); a.download = "astrorus-charla-qr.png"; document.body.appendChild(a); a.click(); a.remove();
+});
+$("pub-exit").addEventListener("click", () => { location.href = location.pathname + "#inicio"; location.reload(); });
+function syncChEq() { if (!S.pub) $("ch-eq").value = ["ojo", "prism"].includes(S.obs) ? "ojo" : "todo"; }
 window.addEventListener("online", renderTripNote); window.addEventListener("offline", renderTripNote);
 $("fact-say").addEventListener("click", () => { const f = ALL_FACTS[FACT_I]; Voice.say(["¿Sabías que…? " + f.t + ". " + f.d]); });
 $("fact-next").addEventListener("click", () => { let i; do { i = Math.floor(Math.random() * ALL_FACTS.length); } while (i === FACT_I); FACT_I = i; renderFacts(); });
@@ -16220,7 +17681,7 @@ $("list-only").addEventListener("change", () => { S.listOnly = $("list-only").ch
 $("list-top").addEventListener("click", () => { nightList().filter(x => x.t.hours30 >= 1).slice(0, 10).forEach(x => S.sel.add(x.o.key)); saveSel(); renderBest(); drawSkyMap(); toast("Marcados los 10 mejores"); });
 $("list-clear").addEventListener("click", () => { S.sel.clear(); saveSel(); S.listOnly = false; $("list-only").checked = false; renderBest(); drawSkyMap(); });
 $("list-more").addEventListener("click", () => { S.listN += 40; renderBest(); });
-window.addEventListener("hashchange", () => setView(location.hash.slice(1)));
+window.addEventListener("hashchange", () => setView(location.hash.slice(1).split("?")[0]));
 let rT; window.addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(() => { drawSkyBg(); if (S.view === "constelaciones") drawConst(); if (S.view === "noche") { drawSkyMap(); drawAltChart(bestList(5).map(x => x.o)); } }, 150); });
 
 /* ================== inicio ================== */
@@ -16230,8 +17691,9 @@ $("voice-rate").value = S.rate;
 $("voice-note").textContent = Voice.ok ? "Buscando voces…" : "Este navegador no permite leer en voz alta.";
 if (Voice.ok) { Voice.load(); try { speechSynthesis.onvoiceschanged = () => Voice.load(); } catch { /* nada */ } }
 (() => { const n = getNight(); const base = n.darkStart ? Math.max(n.darkStart.getTime(), n.date.getTime() + 9 * 3600000) : n.date.getTime() + 9 * 3600000; const st = new Date(Math.ceil(base / 900000) * 900000); $("ch-start").value = `${pad(st.getHours())}:${pad(st.getMinutes())}`; })();
-applyRed(); renderPlaces(); renderEquip(); renderFilters(); syncInputs(); fillDiaryForm(null); renderDiary(); renderPlan(); Data.note();
-drawSkyBg(); setView(location.hash.slice(1) || "inicio");
+initPublic();
+syncChEq(); applyRed(); renderPlaces(); renderEquip(); renderFilters(); syncInputs(); fillDiaryForm(null); renderDiary(); renderPlan(); Data.note();
+drawSkyBg(); setView(location.hash.slice(1).split("?")[0] || "inicio");
 setInterval(() => { if (S.follow) { S.time = new Date(); syncInputs(); if (S.view === "noche") { drawSkyMap(); renderPlanets(); } } }, 60000);
 (async () => {
   try { SAMPLE = await window.claude?.use?.("sample"); } catch { SAMPLE = null; }
